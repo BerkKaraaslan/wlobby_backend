@@ -1,4 +1,8 @@
 
-wlobby_backend_env/
+# Access keys file
 
 src/access_keys.txt
+
+# Virtual Environments
+
+wlobby_backend_env/
