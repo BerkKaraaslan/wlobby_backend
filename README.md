@@ -1,7 +1,7 @@
 # wlobby_backend
 Backend of wlobby app
 
-##Build
+## Build
 1. Create an empty folder and go into that folder.
 2. Create a virtual environment with `python -m venv my_virtual_env` command. Replace your actual virtual environment name to `my_virtual_env`
 3. Put `my_virtual_env/` under the `Virtual Environments` part of `.gitignore` file. In this way, you will not push your virtual environment directory.
