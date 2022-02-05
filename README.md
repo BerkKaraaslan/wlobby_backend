@@ -17,4 +17,7 @@ Backend of wlobby app
    If this command gives you the local host URL you are good, otherwise check previous steps.
    
 If you can achieve all these steps with no errors, then you are all set.
+
+Note: You can reach Django REST Swagger Documentation here
+      Since we don't have any apps or views in our project right now it is useless for now. 
    
