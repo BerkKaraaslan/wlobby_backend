@@ -9,7 +9,7 @@ wlobby_backend_env/
 
 # pycache 
 
-src/wlobby_backend/__pycache__/
+./src/wlobby_backend/__pycache__/
 
 # .pyc and .pyo files
 
