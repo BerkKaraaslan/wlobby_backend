@@ -18,6 +18,6 @@ Backend of wlobby app
    
 If you can achieve all these steps with no errors, then you are all set.
 
-Note: You can reach Django REST Swagger Documentation here
+Note: You can reach Django REST Swagger Documentation [here](https://django-rest-swagger.readthedocs.io/en/latest/).
       Since we don't have any apps or views in our project right now it is useless for now. 
    
