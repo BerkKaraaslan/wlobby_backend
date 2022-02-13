@@ -6,3 +6,12 @@ src/access_keys.txt
 # Virtual Environments
 
 wlobby_backend_env/
+
+# pycache 
+
+src/wlobby_backend/__pycache__/
+
+# .pyc and .pyo files
+
+*.pyc
+*.pyo
