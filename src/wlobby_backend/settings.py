@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-#import os
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-qp3-)pfq+y1yo-&6=1&j^h7pd42otns*w&erq=p2!45-l%6olt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True # Changed for Heroku deployment
+DEBUG = False # Changed for Heroku deployment
 
 ALLOWED_HOSTS = ['127.0.0.1', 'wlobby-backend.herokuapp.com'] # Changed for Heroku deployment
 

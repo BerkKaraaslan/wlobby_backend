@@ -4,4 +4,4 @@ from django.http import HttpResponse
 # Create your views here.
 
 def home_view(*args, **kwargs):
-    return HttpResponse("<h1>Hello World!</h1>")
+    return HttpResponse("<h1>Server is ready to serve!</h1>")
