@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-import os
+#import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-qp3-)pfq+y1yo-&6=1&j^h7pd42otns*w&erq=p2!45-l%6olt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False # Changed for Heroku deployment
+DEBUG = True # Changed for Heroku deployment
 
 ALLOWED_HOSTS = ['127.0.0.1', 'wlobby-backend.herokuapp.com'] # Changed for Heroku deployment
 
@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework_swagger',
+
+    # Our apps
+    'homepage',
 ]
 
 MIDDLEWARE = [
@@ -119,7 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static') # Added for Heroku deployment
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static') # Added for Heroku deployment
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
