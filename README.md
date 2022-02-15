@@ -8,7 +8,7 @@ Backend of wlobby app
    Replace your actual virtual environment name to `my_virtual_env` Note: If you re-build this project and your environment name is already in the `.gitignore` file, 
    then you do not have to add the same name again you can skip this step. 
 4. Activate your virtual environment with `.\my_virtual_env\Scripts\activate` command. Again replace your actual virtual environment name to `my_virtual_env`
-5. Install all dependencies with `python -m pip install -r .\src\requirements.txt` command.
+5. Install all dependencies with `python -m pip install -r requirements.txt` command.
 6. Create a file named `"access_keys.txt"` under the `src` folder. 
 7. Put your access key to the first line and secret access key to the second line of `"access_keys.txt"` file.
 8. Test your API connection with `python dynamodb.py` command. Note: You must be inside the `src` folder.
