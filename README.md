@@ -23,7 +23,7 @@ If you can achieve all these steps with no errors, then you are all set.
 Note: If you install extra packages, you must run `python -m pip freeze > requirements.txt` command in the root directory of project.
       And you must manually delete `pywin32` and `pypiwin32` packages in requirements.txt
       
-Note: Don't push `__pycache__` folders to this repository. They are unnecessary but i forgot to add them to `.gitignore` in advance
+Note: Don't push `__pycache__` folders to this repository. They are unnecessary but i forgot to add them to `.gitignore` in advance.
       You can manually delete these folders before pushing your changes.
 
 Note: You can reach Django REST Swagger Documentation [here](https://django-rest-swagger.readthedocs.io/en/latest/).
