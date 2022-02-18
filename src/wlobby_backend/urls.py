@@ -36,9 +36,9 @@ if settings.DEBUG:
         re_path(r'^media/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
         }),
-        re_path(r'^static/(?P<path>.*)$', serve, {
-            'document_root': settings.STATIC_ROOT,
-        }),
+        re_path(r'^static/(?P<path>.*)$', serve, { # Comment out these lines when run on local host
+            'document_root': settings.STATIC_ROOT, # comment out 
+        }),                                        # comment out   ALSO comment out STATIC_ROOT on settings.py
     ]
     
 
