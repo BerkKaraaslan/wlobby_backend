@@ -10,6 +10,13 @@ DEFAULT_REGION = "us-east-1" # AWS wants a region. In my case it is "us-east-1"
 client = boto3.client('dynamodb', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_access_key = AWS_SECRET_ACCESS_KEY, region_name = DEFAULT_REGION)
 
 
+# burada bir fonksiyon olacak connect gibi bir isimde ve program baslayinca o 1 defa cagrilacak
+# her seferinde dosyadan okuma ve db ye baglanma islemleri yapilmayacak
+
+
+def connect():
+    pass
+
 
 
 # CRUD Functions
