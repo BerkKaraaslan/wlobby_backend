@@ -179,6 +179,154 @@ def create_user(params): # We will write functions like this function
 
 #statement = "SELECT * FROM Student WHERE StudentID=0" # IT WORKS !!!
 
+
+def insert_user_values():
+
+    values = []
+
+    # "'UserID':1, 'CognitoAuthTokens':['access token of bkaslan','refresh token of bkaslan'], 'Name':'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs': [1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests': ['Action', 'Thriller'], 'About':'This is an about section of bkaslan' ")                                                                           
+
+    # calisiyorrr     values.append("'UserID': 1, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
+
+    user1 = "'UserID': 1, 'CognitoAuthTokens': ['access token of bkaslan','refresh token of bkaslan'], 'Name': 'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs':[1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests':['Action', 'Thriller'], 'About':'This is an about section of bkaslan' "                                                                        
+    user2 = "'UserID': 2, 'CognitoAuthTokens': ['access token of sceran','refresh token of sceran'], 'Name': 'Suleyman', 'Surname':'Ceran', 'Username':'sceran', 'AdvertIDs':[], 'Sex':'male', 'Email':'sceran@gmail.com', 'Age':21, 'Location':'Ankara-TUR', 'Bio':'This is a bio of sceran', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400,500], 'WatchedFilms':[300,500,600,100,400], 'RegistrationDate':'2022-01-01 12:35:45.000000', 'LastLogIn':'2022-05-15 23:59:58.171633',  'LogInCount':50, 'Interests':['Drama', 'Horror'], 'About':'This is an about section of sceran' "                                                                        
+    user3 = "'UserID': 3, 'CognitoAuthTokens': ['access token of opolat','refresh token of opolat'], 'Name': 'Omer Faruk', 'Surname':'Polat', 'Username':'opolat', 'AdvertIDs':[6], 'Sex':'male', 'Email':'opolat@gmail.com', 'Age':22, 'Location':'Istanbul-TUR', 'Bio':'This is a bio of opolat', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[400,500,600], 'WatchedFilms':[100,200,300,400,500,600], 'RegistrationDate':'2022-11-27 01:00:17.000000', 'LastLogIn':'2022-11-30 14:20:03.171633',  'LogInCount':18, 'Interests':['Drama', 'Horror', 'Comedy'], 'About':'This is an about section of opolat'"
+    user4 = "'UserID': 4, 'CognitoAuthTokens': ['access token of omujde','refresh token of omujde'], 'Name': 'Ozan', 'Surname':'Mujde', 'Username':'omujde', 'AdvertIDs':[], 'Sex':'male', 'Email':'omujde@gmail.com', 'Age':21, 'Location':'Izmir-TUR', 'Bio':'This is a bio of omujde', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100], 'WatchedFilms':[100,200,500], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':150, 'Interests':['Dark Humor', 'Horror'], 'About':'This is an about section of omujde'"
+    user5 = "'UserID': 5, 'CognitoAuthTokens': ['access token of byalcin','refresh token of byalcin'], 'Name': 'Bugra', 'Surname':'Yalcin', 'Username':'byalcin', 'AdvertIDs':[], 'Sex':'male', 'Email':'byalcin@gmail.com', 'Age':20, 'Location':'Ankara-TUR', 'Bio':'This is a bio of byalcin', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200], 'WatchedFilms':[100,180,200], 'RegistrationDate':'2022-07-06 03:47:59.161723', 'LastLogIn':'2022-07-06 03:47:59.161723',  'LogInCount':1, 'Interests':['Action', 'Comics'], 'About':'This is an about section of byalcin'"
+    user6 = "'UserID': 6, 'CognitoAuthTokens': ['access token of cbloom','refresh token of cbloom'], 'Name': 'Casey', 'Surname':'Bloom', 'Username':'cbloom', 'AdvertIDs':[], 'Sex':'other', 'Email':'cbloom@gmail.com', 'Age':23, 'Location':'Berlin-GER', 'Bio':'This is a bio of cbloom', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,500], 'WatchedFilms':[180,100,300,500,400], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':61, 'Interests':['Horror', 'Anime'], 'About':'This is an about section of cbloom'"
+    user7 = "'UserID': 7, 'CognitoAuthTokens': ['access token of mcartney','refresh token of mcartney'], 'Name': 'Monica', 'Surname':'Cartney', 'Username':'mcartney', 'AdvertIDs':[2,5], 'Sex':'female', 'Email':'mcartney@gmail.com', 'Age':20, 'Location':'Berlin-GER', 'Bio':'This is a bio of mcartney', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[150,100,500], 'WatchedFilms':[150,100,500], 'RegistrationDate':'2021-06-06 09:22:35.101220', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':12, 'Interests':['Drama', 'Biography'], 'About':'This is an about section of mcartney'"
+    user8 = "'UserID': 8, 'CognitoAuthTokens': ['access token of dson','refresh token of dson'], 'Name': 'David', 'Surname':'Son', 'Username':'dson', 'AdvertIDs':[], 'Sex':'other', 'Email':'dson@gmail.com', 'Age':28, 'Location':'London-ENG', 'Bio':'This is a bio of dson', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,200], 'WatchedFilms':[180,200], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-01-31 23:44:12.131739',  'LogInCount':31, 'Interests':['Cartoon'], 'About':'This is an about section of dson'"
+    user9 = "'UserID': 9, 'CognitoAuthTokens': ['access token of edoe','refresh token of edoe'], 'Name': 'Emma', 'Surname':'Doe', 'Username':'edoe', 'AdvertIDs':[], 'Sex':'female', 'Email':'edoe@gmail.com', 'Age':19, 'Location':'London-ENG', 'Bio':'This is a bio of edoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200,400], 'WatchedFilms':[200,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':72, 'Interests':['Dc', 'Marvel'], 'About':'This is an about section of edoe'"
+    user10 = "'UserID': 10, 'CognitoAuthTokens': ['access token of jdoe','refresh token of jdoe'], 'Name': 'James', 'Surname':'Doe', 'Username':'jdoe', 'AdvertIDs':[4], 'Sex':'male', 'Email':'jdoe@gmail.com', 'Age':24, 'Location':'London-ENG', 'Bio':'This is a bio of jdoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,150,200,400], 'WatchedFilms':[180,150,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':60, 'Interests':['Civil War', 'Cold War'], 'About':'This is an about section of jdoe'"
+
+
+    # bu sekilde her useri ekle !!!
+
+
+
+    values.append(user1)
+    values.append(user2)
+    values.append(user3)
+    values.append(user4)
+    values.append(user5)
+    values.append(user6)
+    values.append(user7)
+    values.append(user8)
+    values.append(user9)
+    values.append(user10)
+
+
+
+
+
+    # 400 kilobaytin altindaki stringler tabloya koyulabiliyor. profile fotosu string olarak tutulacak.
+
+    # Profile fotosu string olarak kaydediliyor. onu string olarak kaydet ve alinca image e donusumu yap
+
+    # 
+
+
+
+
+    #values.append("'UserID': {'N':'1'}, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
+
+    insert_statement = "INSERT INTO FakeUser VALUE {" + values[0] + "}"
+
+    select_statement = "SELECT * FROM FakeUser"
+
+    delete_statement = "DELETE FROM FakeUser WHERE UserID=1"
+
+
+    for i in range(10):
+        temp_statement = "INSERT INTO FakeUser VALUE {" + values[i] + "}"
+        response = client.execute_statement(Statement=temp_statement) 
+
+    #response = client.execute_statement(Statement=delete_statement) 
+
+    response = client.execute_statement(Statement=select_statement) 
+
+    print(response["Items"])
+
+
+
+#insert_user_values()
+
+
+def insert_advert_values():
+
+    values = []
+
+                                                                             
+
+    advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100 "                                                                        
+    advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150 "
+    advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200 "
+    advert4 = "'AdvertID': 4, 'OwnerID': 10, 'Date': '2022-02-28 12:30:00.000000', 'RegistrationDate':'2022-02-15 10:09:16.001234', 'LastUpdateDate':'2022-02-15 11:37:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [10,5,6,7,8], 'Status': 'Active', 'FilmID': 180 "
+    advert5 = "'AdvertID': 5, 'OwnerID': 7, 'Date': '2022-02-25 11:00:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-15 20:55:18.123456', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [7,2,9,16], 'Status': 'Active', 'FilmID': 100 "
+    advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300 "
+    advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500 "
+    advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400 "
+
+
+   
+
+
+
+    values.append(advert1)
+    values.append(advert2)
+    values.append(advert3)
+    values.append(advert4)
+    values.append(advert5)
+    values.append(advert6)
+    values.append(advert7)
+    values.append(advert8)
+    
+  
+
+
+
+
+
+    # 400 kilobaytin altindaki stringler tabloya koyulabiliyor. profile fotosu string olarak tutulacak.
+
+    # Profile fotosu string olarak kaydediliyor. onu string olarak kaydet ve alinca image e donusumu yap
+
+    # 
+
+
+
+
+    #values.append("'UserID': {'N':'1'}, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
+
+    insert_statement = "INSERT INTO FakeAdvert VALUE {" + values[0] + "}"
+
+    select_statement = "SELECT * FROM FakeAdvert"
+
+    delete_statement = "DELETE FROM FakeAdvert WHERE UserID=1"
+
+
+    #for i in range(8):
+    #    temp_statement = "INSERT INTO FakeAdvert VALUE {" + values[i] + "}"
+    #    response = client.execute_statement(Statement=temp_statement) 
+
+    #response = client.execute_statement(Statement=delete_statement) 
+
+    response = client.execute_statement(Statement=select_statement) 
+
+    print(response["Items"])
+
+
+    
+
+
+#insert_advert_values()
+
+
+
+
+
+
+
 statement = "SELECT * FROM Student" # IT WORKS !!!
 
 item = (2, 'Berk', 'Karaaslan', 20)
@@ -208,7 +356,7 @@ statement6 = "UPDATE Student REMOVE Name WHERE Name='NotBerk' AND StudentID=2" #
 # Yani bir key attribute un degeri bos birakilarak update ve remove yapilamaz ancak select ve bir attribute icin remove yapilabilir 
 # Insert statement ı normal bir sekilde yapilabilir onun icin ozel bir seye gerek yoktur.
 
-response = client.execute_statement(Statement=statement) 
+#response = client.execute_statement(Statement=statement) 
 
 #my_key_list = response["Items"]
 
@@ -237,7 +385,7 @@ response = client.execute_statement(Statement=statement)
 #meaningful_item = response["Items"] # It is a dictionary object, we can print all key-value pairs in this dictionary
 #Note: This dictionary's values are dictionary too. 
 
-print(response["Items"])  
+#print(response["Items"])  
 
 #print(meaningful_item)
 
