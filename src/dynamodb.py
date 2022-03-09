@@ -1,5 +1,9 @@
 import boto3
 
+from id_generator import *
+from current_time import *
+
+
 with open('access_keys.txt') as f:
     lines = f.readlines()
 
@@ -21,47 +25,112 @@ def connect():
 
 # CRUD Functions
 
+
+
+
 # CREATE Functions
+
+
+
+
 
 INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
-def create_user(name,surname,username,sex,email,age,location,bio,profilephoto,likedfilms,interests,about):
-    # UserId id_generator.py dosyasından alınacak ve tekrar o dosyadan ıd yi update etmek icin increment user id cagrilacak
-    # Name, Surname ve Username parametre olarak alinacak
-    # AdvertIDs basta bos bir liste olarak db de tutulacak
-    # Sex, Email,Age parametre olarak alinacak
-    # Location, Bio, ProfilePhoto parametre olarak alinacak
-    # LikedFilms i movie id listesi olarak parametre alacak
-    # WatchedFilms basta bos bir liste olarak db de tutulacak
-    # RegistrationDate current time.py dosyasından alınacak
-    # LastLogIn basta RegistrationDate ile esitlenecek yani ayni degeri tutacak
-    # Daha sonra user a update ler geldikce ve giris yapdikca artacak
-    # LogInCount da initial deger olarak 1 tutacak
-    # Interests parametre olarak alinacak ve bu parametrenin type i string list olacak
-    # About da string olarak parametre alinacak
+def create_user(authtokens,name,surname,username,sex,email,age,location,bio,profilephoto,likedfilms,interests,about):
+    # PARAMETER TYPES
 
-    # User icin de LastUpdateDate TUTULACAK ve User da bir degisikligin son yapildigi zamani tutacak
+    # authtokens -> string list
+    # name -> str
+    # surname -> str
+    # username -> str
+    # sex -> str
+    # email -> str
+    # age -> int
+    # location -> str
+    # bio -> str
+    # profilephoto -> str
+    # likedfilms -> integer list
+    # interests -> string list
+    # about -> str
 
-    # baslangicta bunun degeri registration date olacak
+    try:
 
-    return 1
+        user_id = get_user_id()
+        increment_user_id()
+        advert_ids = [] # Initially an empty list
+        watched_films = []
+        registration_date = curr_time()
+        last_log_in = registration_date # Initially they are equal
+        log_in_count = INITIAL_LOGIN_VALUE
+        last_update_date = registration_date # Initially they are equal
+
+        TABLE_NAME = 'FakeUser'
+        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {name}, 'Surname': {surname}, 'Username': {username}, 'AdvertIDs': {advert_ids}, 'Sex': {sex}, 'Email': {email}, 'Age': {age}, 'Location': {location}, 'Bio': {bio}, 'ProfilePhoto': {profilephoto}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {about}, 'LastUpdateDate': {last_update_date}"
+        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE" + "{" + item + "}"
+
+        result_dict = {} # bunun icine status, message gibi attribute lar koy.
+        # user ıd vs de bunun icinde donulecek
+
+        response = client.execute_statement(Statement=insert_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+
+    except:
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = "An exception occured"
+        return result_dict
+
+    
+    result_dict["Status"] = "Success"
+    result_dict["Message"] = f"New user successfully created with user id:{user_id}"
+    result_dict["UserID"] = user_id
+    return result_dict
+
+
+
 
 def create_advert(ownerid,date,quota,preference,filmid):
-    # AdvertID id_generator.py dan alinacak ve tekrar o dosyadan id yi update etmek icin increment advert id cagrilacak
-    # Ownerid parametre olarak alinacak
-    # Date i parametre olarak alacak. date ilanin ne zaman icin planlandigini gosterir. Date i belirtilen formatta (current time.py formatında) string olarak alacak
-    # RegistrationDate ilanin ne zaman olusturuldugunu tutacak bunu current_time.py dan alacak
-    # LastUpdateDate basta registrationdate e esit olacak daha sonra ilan icin bir update geldigi zaman bu guncellenecek
-    # Quota int parametre olacak alinacak
-    # AttendeePreference string parametre olarak belirtilen formatlarda alinacak
-    # AttendeeIDs basta sadece owner in id sini iceren bir int listesi olacak
-    # Status basta direk active olacak cunku gecmis bir tarihe ilan olusturmaya izin vermeyecegiz o yuzden parametre olmasina gerek yok
-    # FilmID bize direk frontend den gelecek int parametre seklinde kaydedilecek
+    # PARAMETER TYPES
 
-    return 1
+    # ownerid -> int
+    # date -> str
+    # quota -> int
+    # preference -> str
+    # filmid -> int
+    
+    try:
+
+        advert_id = get_advert_id()
+        increment_advert_id()
+        registration_date = curr_time()
+        last_update_date = registration_date # Initially they are equal
+        attendee_ids = []
+        attendee_ids.append(ownerid)
+        status = "active"
+
+        TABLE_NAME = 'FakeAdvert'
+        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Date': {date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
+        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE" + "{" + item + "}"
+
+        result_dict = {} 
+
+        response = client.execute_statement(Statement=insert_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+
+    except:
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = "An exception occured"
+        return result_dict
+
+    
+    result_dict["Status"] = "Success"
+    result_dict["Message"] = f"New advert successfully created with advert id:{advert_id}"
+    result_dict["AdvertID"] = advert_id
+    return result_dict
+
 
 
 # RETRIEVE Functions
+
 
 
 def retrieve_user(userid):
@@ -80,6 +149,10 @@ def retrieve_advert(advertid):
 
 def retrieve_all_adverts(userid):
     # verilen user id ye sahip userin butun ilanlarini dondurur
+    pass
+
+def retrieve_all_users():
+    # butun userlari getir
     pass
 
 
@@ -161,8 +234,7 @@ def delete_all_adverts():
 #        }
 #    })
 
-def create_user(params): # We will write functions like this function
-    pass
+
 
 
 # FakeUser tablosu  UserID partition key i type i number yine us east 1 icin yaratildi !!!
@@ -329,6 +401,110 @@ def insert_advert_values():
 #insert_advert_values()
 
 
+
+
+
+
+
+
+
+
+def insert_sample_user():
+
+    statement = "INSERT INTO FakeUser VALUE {" + "'UserID': 100, 'FavoriteFood':'Ice Cream'" + "}"
+    client.execute_statement(Statement=statement) 
+    select_statement = "SELECT * FROM FakeUser WHERE UserID=100"
+    response = client.execute_statement(Statement=select_statement) 
+
+    print(response["Items"][0]["FavoriteFood"]["S"])
+
+
+    
+    
+
+
+#insert_sample_user()
+
+
+
+def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevirir
+                          # Parametre olarak bir dictionary alir ve cevap olarak yine bir dictionary doner
+
+    formatted_item = {}
+
+    for key in item.keys():
+        dictionary_value = item[key]
+        tmp_value = list(dictionary_value.keys())
+        tmp_value = tmp_value[0]
+        real_value = dictionary_value[tmp_value]
+        
+        if tmp_value == "N": # Cast if necessary
+            real_value = int(real_value)
+
+        formatted_item[key] = real_value
+        
+        if type(real_value) is list:
+            list_items = []
+            for value in real_value:
+                if list(value.keys())[0] == "N": # Cast if necessary
+                    tmp = int(list(value.values())[0])
+                else:
+                    tmp = list(value.values())[0]
+
+                list_items.append(tmp)
+            
+            formatted_item[key] = list_items
+
+    return formatted_item
+
+
+
+""" def test_format_user():
+    
+
+    select_statement = "SELECT * FROM FakeAdvert WHERE AdvertID=1"
+
+    
+    response = client.execute_statement(Statement=select_statement) 
+
+    formatted_response = format_user(response["Items"][0])
+
+    #formatted_response = format_user({}) 
+
+    print("This is type of formatted response:" + str(type(formatted_response)))
+    print()
+    #print(formatted_response)
+
+    for key in formatted_response.keys():
+        print(formatted_response[key])
+        print("This is type of a value" + str(type(formatted_response[key])))
+        print()
+        print()
+
+
+    # sadece list veya set olanlarda yaziyor
+    # list ler icin direk dictionary nin values() yapilabilir
+    # her dict icin values cagirilir ve bunlar bir list te tutulup en son nihai value olarak bizim key e yazilir
+
+    # o list icinde gezip her dict icin values()[0] i diyecegiz. 
+
+ """
+
+
+
+
+
+
+
+
+
+# bir tane dummy user ekle ve bu user i geri cagir select ile
+# donen itemlerden istenen dictionary yi alma yontemi
+
+# [d for d in a if d['name'] == 'pluto']
+# burada a dedigimiz dictionary listesi
+# d ise tek dictionary yi listeye eklemek icin tmp variable
+# eger name attribute u pluto ise onu aliyor.
 
 
 
