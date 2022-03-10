@@ -160,7 +160,7 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
 
 
 
-
+# Advert yaratinca advert in id sinin owner inin advert ids kismina eklenmesi gerek onu yap !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 def create_advert(ownerid,date,quota,preference,filmid):
     # PARAMETER TYPES
 
@@ -347,6 +347,7 @@ def retrieve_all_users():
 
 # UPDATE Functions
 
+
 # butun normal attribute lar icin update fonksiyonlari olacak hem user hem de advert icin
 
 # Ayrica user in liked films lerine film ekle veya liked films lerinden film cikar gibi fonksiyonlar da olacak
@@ -358,6 +359,132 @@ def retrieve_all_users():
 # cikar kisimlari  delete functions bolomunde olacak
 
 # bir update oldugu zaman hem user hem de advert de lastupdatedate current time ile guncellenecek
+
+
+# user icin gerekli update fonksiyonlari
+
+
+# update authentication tokens, name, surname, username, sex, email, age, location, bio, photo, about, interests
+# yukaridaki attributelar update sirasinda direk overwrite edilecek
+# her update fonksiyonunda lust update date guncellenecek !!!!
+
+
+
+
+
+
+
+# bu fonksiyon user in "UserID", "AdvertIDs", "LikedFilms", "WatchedFilms" disinda kalan butun attribute larini update eder.
+# attribute parametresi guncellenecek attribute un ismini icerir
+# new_value ise bu attribute un alacagi degeri tasir
+
+def update_user(userid, attribute, new_value): # verilen user i verilen attribute ismini new value ile update edecek
+    # PARAMETER TYPES
+
+    # userid -> int
+    # attribute -> str
+    # new_value -> it could be any valid attribute type
+    
+    try:
+        TABLE_NAME = "FakeUser"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+        response = client.execute_statement(Statement=select_statement)
+        user = response["Items"]
+        result_dict = {}
+
+        if len(user) == 0: # No such user exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such user exist with user id:{userid}"
+            result_dict["UserID"] = userid
+            return result_dict
+        else: # User exist
+          
+            old = None
+            user = format_db_item(user[0])
+            last_update_date = "'" + curr_time() + "'" # user update edildigi icin son guncellenme tarihi guncellenecek
+            
+            if attribute in user.keys(): # we must get the old value
+                old = user[attribute]
+            
+            if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
+                new_value = "'" + new_value + "'"
+
+            update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
+            response = client.execute_statement(Statement=update_statement)
+
+            result_dict["Status"] = "Success"
+            if old is None: # eskiden bu attribute yokmus
+                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to user with user id:{userid}"
+            else:
+                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for user with user id:{userid}"
+
+            result_dict["UserID"] = userid
+            if old is not None:
+                result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
+            result_dict["NewValue"] = new_value
+
+            return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+
+
+
+    
+
+
+# simdi user in list olan attributelarina ekleme cikarma seklinde fonksiyonlari yaz
+# ayrica advert yaratinca onu owner inin listesine ekle  create advert in basinda yaziyor yapilacak olan sey
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # DELETE Functions
