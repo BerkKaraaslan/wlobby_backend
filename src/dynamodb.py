@@ -23,6 +23,79 @@ def connect():
 
 
 
+def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevirir
+                          # Parametre olarak bir dictionary alir ve cevap olarak yine bir dictionary doner
+
+    formatted_item = {}
+
+    for key in item.keys():
+        dictionary_value = item[key]
+        tmp_value = list(dictionary_value.keys())
+        tmp_value = tmp_value[0]
+        real_value = dictionary_value[tmp_value]
+        
+        if tmp_value == "N": # Cast if necessary
+            real_value = int(real_value)
+
+        formatted_item[key] = real_value
+        
+        if type(real_value) is list:
+            list_items = []
+            for value in real_value:
+                if list(value.keys())[0] == "N": # Cast if necessary
+                    tmp = int(list(value.values())[0])
+                else:
+                    tmp = list(value.values())[0]
+
+                list_items.append(tmp)
+            
+            formatted_item[key] = list_items
+
+    return formatted_item
+
+
+
+""" def test_format_user():
+    
+
+    select_statement = "SELECT * FROM FakeAdvert WHERE AdvertID=1"
+
+    
+    response = client.execute_statement(Statement=select_statement) 
+
+    formatted_response = format_user(response["Items"][0])
+
+    #formatted_response = format_user({}) 
+
+    print("This is type of formatted response:" + str(type(formatted_response)))
+    print()
+    #print(formatted_response)
+
+    for key in formatted_response.keys():
+        print(formatted_response[key])
+        print("This is type of a value" + str(type(formatted_response[key])))
+        print()
+        print()
+
+
+    # sadece list veya set olanlarda yaziyor
+    # list ler icin direk dictionary nin values() yapilabilir
+    # her dict icin values cagirilir ve bunlar bir list te tutulup en son nihai value olarak bizim key e yazilir
+
+    # o list icinde gezip her dict icin values()[0] i diyecegiz. 
+
+ """
+
+
+
+
+
+
+
+
+
+
+
 # CRUD Functions
 
 
@@ -133,27 +206,143 @@ def create_advert(ownerid,date,quota,preference,filmid):
 
 
 
-def retrieve_user(userid):
-    # UserID si verilen user i dondurecek
-    # Dondururken formatin iyi olmasina dikkat et 
-    # Yani or {Id: {N: 5}} gibi degil {Id: 5} seklinde olmali yani attribute type larini gosteren parametreleri at
-    # Id["N"] i gibi yaparak direk 5 degeri alinabilir
-    pass
 
+
+# bu fonksiyon bir dictionary doner
+# bu dictionary de "Status" islemin durumunu
+# "Message" aciklamayi
+# "Item" ise eger varsa o id ile bulunan user i bir dictionary olarak doner
+# "UserID" eger user bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
+
+def retrieve_user(userid):
+    # PARAMETER TYPES
+
+    # userid -> int
+
+    try:
+        TABLE_NAME = "FakeUser"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+        response = client.execute_statement(Statement=select_statement)
+        user = response["Items"]
+
+        result_dict = {}
+
+        if len(user) == 0: # No such user exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such user exist with user id:{userid}"
+            result_dict["UserID"] = userid
+            return result_dict
+        else: # User exist
+            result_dict["Status"] = "Success"
+            result_dict["Message"] = f"User with user id:{userid} successfully retrieved"
+            user = format_db_item(user[0])
+            result_dict["Item"] = user
+            return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+# bu fonksiyon bir dictionary doner
+# bu dictionary de "Status" islemin durumunu
+# "Message" aciklamayi
+# "Item" ise eger varsa o id ile bulunan advert i bir dictionary olarak doner
+# "AdvertID" eger advert bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
 
 def retrieve_advert(advertid):
-    # AdvertID si verilen advert i dondurecek
-    # Dondururken formatin iyi olmasina dikkat et 
-    # Yani or {Id: {N: 5}} gibi degil {Id: 5} seklinde olmali yani attribute type larini gosteren parametreleri at
-    pass
+    # PARAMETER TYPES
+
+    # advertid -> int
+
+    try:
+        TABLE_NAME = "FakeAdvert"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
+        response = client.execute_statement(Statement=select_statement)
+        advert = response["Items"]
+
+        result_dict = {}
+
+        if len(advert) == 0: # No such user exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
+            result_dict["AdvertID"] = advertid
+            return result_dict
+        else: # User exist
+            result_dict["Status"] = "Success"
+            result_dict["Message"] = f"Advert with advert id:{advertid} successfully retrieved"
+            advert = format_db_item(advert[0])
+            result_dict["Item"] = advert
+            return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+# bu fonksiyon bir dictionary doner
+# bu dictionary de "Status" islemin durumunu
+# "Message" aciklamayi
+# "Item" ise eger varsa o id ile bulunan userin "AdvertIDs" listesini icerir
+# "UserID" eger user bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
 
 def retrieve_all_adverts(userid):
-    # verilen user id ye sahip userin butun ilanlarini dondurur
-    pass
+    # PARAMETER TYPES
+
+    # userid -> int
+
+    try:
+        TABLE_NAME = "FakeUser"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+        response = client.execute_statement(Statement=select_statement)
+        user = response["Items"]
+
+        result_dict = {}
+
+        if len(user) == 0: # No such user exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such user exist with user id:{userid}"
+            result_dict["UserID"] = userid
+            return result_dict
+        else: # User exist
+            result_dict["Status"] = "Success"
+            result_dict["Message"] = f"User with user id:{userid} successfully retrieved"
+            user = format_db_item(user[0])
+            result_dict["Item"] = user["AdvertIDs"]
+            return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+# bu fonksiyon bir dictionary doner
+# bu dictionary de "Status" islemin durumunu
+# "Message" aciklamayi
+# "Items" ise butun userlari bir dictionary listesi halinde doner. her user bir dictionary dir
 
 def retrieve_all_users():
-    # butun userlari getir
-    pass
+
+    try:
+        TABLE_NAME = "FakeUser"
+        select_statement = f"SELECT * FROM {TABLE_NAME}"
+        response = client.execute_statement(Statement=select_statement)
+        items = response["Items"]
+
+        result_dict = {}
+        users = []
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All users successfully retrieved"
+        for item in items:
+            tmp = format_db_item(item)
+            users.append(tmp)
+
+        result_dict["Items"] = users
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
 
 
 # UPDATE Functions
@@ -174,6 +363,12 @@ def retrieve_all_users():
 # DELETE Functions
 
 # Normal attributelar icin delete fonksiyonu yazilmayacak
+
+# dynamodb de olmayan bir item i silmeyece calistigimizda error vermiyor
+# dolayısıyla for ile 1 den get_user_id veya get_advert_id ye kadar gecebiliriz
+
+
+
 
 def delete_user(userid):
     # bu fonksiyon verilen userid ye sahip user i silecek
@@ -424,73 +619,6 @@ def insert_sample_user():
 
 
 #insert_sample_user()
-
-
-
-def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevirir
-                          # Parametre olarak bir dictionary alir ve cevap olarak yine bir dictionary doner
-
-    formatted_item = {}
-
-    for key in item.keys():
-        dictionary_value = item[key]
-        tmp_value = list(dictionary_value.keys())
-        tmp_value = tmp_value[0]
-        real_value = dictionary_value[tmp_value]
-        
-        if tmp_value == "N": # Cast if necessary
-            real_value = int(real_value)
-
-        formatted_item[key] = real_value
-        
-        if type(real_value) is list:
-            list_items = []
-            for value in real_value:
-                if list(value.keys())[0] == "N": # Cast if necessary
-                    tmp = int(list(value.values())[0])
-                else:
-                    tmp = list(value.values())[0]
-
-                list_items.append(tmp)
-            
-            formatted_item[key] = list_items
-
-    return formatted_item
-
-
-
-""" def test_format_user():
-    
-
-    select_statement = "SELECT * FROM FakeAdvert WHERE AdvertID=1"
-
-    
-    response = client.execute_statement(Statement=select_statement) 
-
-    formatted_response = format_user(response["Items"][0])
-
-    #formatted_response = format_user({}) 
-
-    print("This is type of formatted response:" + str(type(formatted_response)))
-    print()
-    #print(formatted_response)
-
-    for key in formatted_response.keys():
-        print(formatted_response[key])
-        print("This is type of a value" + str(type(formatted_response[key])))
-        print()
-        print()
-
-
-    # sadece list veya set olanlarda yaziyor
-    # list ler icin direk dictionary nin values() yapilabilir
-    # her dict icin values cagirilir ve bunlar bir list te tutulup en son nihai value olarak bizim key e yazilir
-
-    # o list icinde gezip her dict icin values()[0] i diyecegiz. 
-
- """
-
-
 
 
 
