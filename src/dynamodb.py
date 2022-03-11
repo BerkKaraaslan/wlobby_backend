@@ -543,24 +543,71 @@ def update_user_list_attributes(userid, attribute, value, op_type):
 
 
 
-#tmp = update_user_list_attributes(1,"StringAttribute","asd","ahaha")
-#print(tmp)
-#print()
-#print()
-#print()
+# advert icinde update fonksiyonlari olmali
 
-#tmp = retrieve_user(1)
-#print(tmp)
+# 1 tane generic olacak bu AttendeeIDs disinda hepsini update edecek
+# attende ids i de update edecek ancak direk overwrite edecek
+
+# 1 tane de attende id s e ekleme ve cikarma yapan bir fonksiyon olacak
 
 
 
 
 
+
+
+def update_advert(advertid, attribute, new_value): # verilen user i verilen attribute ismini new value ile update edecek
+    # PARAMETER TYPES
+
+    # advertid -> int
+    # attribute -> str
+    # new_value -> it could be any valid attribute type
     
+    try:
+        TABLE_NAME = "FakeAdvert"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
+        response = client.execute_statement(Statement=select_statement)
+        advert = response["Items"]
+        result_dict = {}
+
+        if len(advert) == 0: # No such advert exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
+            result_dict["AdvertID"] = advertid
+            return result_dict
+        else: # Advert exist
+          
+            old = None
+            advert = format_db_item(advert[0])
+            last_update_date = "'" + curr_time() + "'" # advert update edildigi icin son guncellenme tarihi guncellenecek
+            
+            if attribute in advert.keys(): # we must get the old value
+                old = advert[attribute]
+            
+            if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
+                new_value = "'" + new_value + "'"
+
+            update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
+            response = client.execute_statement(Statement=update_statement)
+
+            result_dict["Status"] = "Success"
+            if old is None: # eskiden bu attribute yokmus
+                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to advert with advert id:{advertid}"
+            else:
+                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for advert with advert id:{advertid}"
+
+            result_dict["AdvertID"] = advertid
+            if old is not None:
+                result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
+            result_dict["NewValue"] = new_value
+
+            return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
 
 
 
-    
 
 
 
@@ -569,10 +616,120 @@ def update_user_list_attributes(userid, attribute, value, op_type):
 
 
 
+def update_advert_list_attributes(advertid, attribute, value, op_type):
+    # PARAMETER TYPES
+
+    # advertid -> int
+    # attribute -> str
+    # value -> it could be any valid attribute type
+    # op_type -> str  only valid values are "add" and "remove" !
+
+
+    # attribute str olarak hangi parametrenin update edilecegini tutacak
+    # value herhangi bir type da add veya remove yapilacak item i tutacak
+    # op_type ise string olarak "add" veya "remove" degerlerini alabilecek
+
+    try:
+        TABLE_NAME = "FakeAdvert"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
+        response = client.execute_statement(Statement=select_statement)
+        advert = response["Items"]
+        result_dict = {}
+
+        if len(advert) == 0: # No such advert exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
+            result_dict["AdvertID"] = advertid
+            return result_dict
+        else: # Advert exist
+            
+                advert = format_db_item(advert[0])
+                last_update_date = "'" + curr_time() + "'" # advert update edildigi icin son guncellenme tarihi guncellenecek
+                
+                if op_type == "add":
+
+                    if attribute not in advert.keys(): # boyle bir attribute yok
+
+                        list_attribute = []
+                        list_attribute.append(value)
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} has successfully added to advert:{advertid} with value:{value}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                    list_attribute = advert[attribute] # ekleme yapilacak attribute u al
+
+                    if value in list_attribute: # deger zaten varmis tekrar ekleme yapilmayacak uygun bir mesajla don
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} is already contains value:{value}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                    else: # deger yokmus simdi eklenecek
+
+                        list_attribute.append(value) # value yu attribute a ekle
+
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Value:{value} is successfully added to attribute:{attribute}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                elif op_type == "remove": # silinecek
 
 
 
+                    if attribute not in advert.keys(): # boyle bir attribute yok
 
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Advert with advert id:{advertid} already does not contain attribute:{attribute}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                    list_attribute = advert[attribute] # silme yapilacak attribute u al
+
+                    if value in list_attribute: # deger varmis silinmesi gerekir
+
+                        list_attribute.remove(value) # degeri attribute dan sil
+
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Value:{value} is successfully deleted from attribute:{attribute}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                    else: # deger yokmus bir sey yapmaya gerek yok
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} does not contain value:{value}"
+                        result_dict["AdvertID"] = advertid
+                        return result_dict
+
+                else:
+                    result_dict["Status"] = "Fail"
+                    result_dict["Message"] = "Bad op_type. Valid values for op_type are \"add\" and \"remove\""
+                    return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+tmp = update_advert_list_attributes(1,"AttendeeIDs",3,"addos")
+print(tmp)
+print()
+print()
+print()
+
+tmp = retrieve_advert(1)
+print(tmp)
 
 
 
