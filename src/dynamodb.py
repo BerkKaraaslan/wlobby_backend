@@ -375,6 +375,8 @@ def retrieve_all_users():
 
 
 # bu fonksiyon user in "UserID", "AdvertIDs", "LikedFilms", "WatchedFilms" disinda kalan butun attribute larini update eder.
+# burada belirtilen attribute lari da update edebilir ancak direk uzerine yazar yani ilan listesine eleman ekle eleman cikar gibi seyleri yapamaz!
+# bu islemleri 1 asagidaki fonksiyon yapacak
 # attribute parametresi guncellenecek attribute un ismini icerir
 # new_value ise bu attribute un alacagi degeri tasir
 
@@ -429,6 +431,126 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
+# "AdvertIDs", "LikedFilms", "WatchedFilms"
+def update_user_list_attributes(userid, attribute, value, op_type):
+    # PARAMETER TYPES
+
+    # userid -> int
+    # attribute -> str
+    # value -> it could be any valid attribute type
+    # op_type -> str  only valid values are "add" and "remove" !
+
+
+    # attribute str olarak hangi parametrenin update edilecegini tutacak
+    # value herhangi bir type da add veya remove yapilacak item i tutacak
+    # op_type ise string olarak "add" veya "remove" degerlerini alabilecek
+
+    try:
+        TABLE_NAME = "FakeUser"
+        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+        response = client.execute_statement(Statement=select_statement)
+        user = response["Items"]
+        result_dict = {}
+
+        if len(user) == 0: # No such user exist
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"No such user exist with user id:{userid}"
+            result_dict["UserID"] = userid
+            return result_dict
+        else: # User exist
+            
+                user = format_db_item(user[0])
+                last_update_date = "'" + curr_time() + "'" # user update edildigi icin son guncellenme tarihi guncellenecek
+                
+                if op_type == "add":
+
+                    if attribute not in user.keys(): # boyle bir attribute yok
+
+                        list_attribute = []
+                        list_attribute.append(value)
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} has successfully added to user:{userid} with value:{value}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                    list_attribute = user[attribute] # ekleme yapilacak attribute u al
+
+                    if value in list_attribute: # deger zaten varmis tekrar ekleme yapilmayacak uygun bir mesajla don
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} is already contains value:{value}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                    else: # deger yokmus simdi eklenecek
+
+                        list_attribute.append(value) # value yu attribute a ekle
+
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Value:{value} is successfully added to attribute:{attribute}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                elif op_type == "remove": # silinecek
+
+
+
+                    if attribute not in user.keys(): # boyle bir attribute yok
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"User with user id:{userid} already does not contain attribute:{attribute}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                    list_attribute = user[attribute] # silme yapilacak attribute u al
+
+                    if value in list_attribute: # deger varmis silinmesi gerekir
+
+                        list_attribute.remove(value) # degeri attribute dan sil
+
+                        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={list_attribute} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
+                        response = client.execute_statement(Statement=update_statement)
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Value:{value} is successfully deleted from attribute:{attribute}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                    else: # deger yokmus bir sey yapmaya gerek yok
+
+                        result_dict["Status"] = "Success"
+                        result_dict["Message"] = f"Attribute:{attribute} does not contain value:{value}"
+                        result_dict["UserID"] = userid
+                        return result_dict
+
+                else:
+                    result_dict["Status"] = "Fail"
+                    result_dict["Message"] = "Bad op_type. Valid values for op_type are \"add\" and \"remove\""
+                    return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+
+
+
+#tmp = update_user_list_attributes(1,"StringAttribute","asd","ahaha")
+#print(tmp)
+#print()
+#print()
+#print()
+
+#tmp = retrieve_user(1)
+#print(tmp)
 
 
 
@@ -437,13 +559,8 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
     
 
 
-# simdi user in list olan attributelarina ekleme cikarma seklinde fonksiyonlari yaz
-# ayrica advert yaratinca onu owner inin listesine ekle  create advert in basinda yaziyor yapilacak olan sey
 
-
-
-
-
+    
 
 
 
