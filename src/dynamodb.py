@@ -127,23 +127,31 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
     # about -> str
 
     try:
-
+        
+        formatted_name = "'" + name + "'"
+        formatted_surname = "'" + surname + "'"
+        formatted_username = "'" + username + "'"
+        formatted_sex = "'" + sex + "'"
+        formatted_email = "'" + email + "'"
+        formatted_location = "'" + location + "'"
+        formatted_bio = "'" + bio + "'"
+        formatted_photo = "'" + profilephoto + "'"
+        formatted_about = "'" + about + "'"
         user_id = get_user_id()
         increment_user_id()
         advert_ids = [] # Initially an empty list
         watched_films = []
-        registration_date = curr_time()
+        registration_date = "'" + curr_time() + "'"
         last_log_in = registration_date # Initially they are equal
         log_in_count = INITIAL_LOGIN_VALUE
         last_update_date = registration_date # Initially they are equal
 
         TABLE_NAME = 'FakeUser'
-        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {name}, 'Surname': {surname}, 'Username': {username}, 'AdvertIDs': {advert_ids}, 'Sex': {sex}, 'Email': {email}, 'Age': {age}, 'Location': {location}, 'Bio': {bio}, 'ProfilePhoto': {profilephoto}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {about}, 'LastUpdateDate': {last_update_date}"
-        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE" + "{" + item + "}"
+        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {formatted_name}, 'Surname': {formatted_surname}, 'Username': {formatted_username}, 'AdvertIDs': {advert_ids}, 'Sex': {formatted_sex}, 'Email': {formatted_email}, 'Age': {age}, 'Location': {formatted_location}, 'Bio': {formatted_bio}, 'ProfilePhoto': {formatted_photo}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {formatted_about}, 'LastUpdateDate': {last_update_date}"
+        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
 
         result_dict = {} # bunun icine status, message gibi attribute lar koy.
         # user ıd vs de bunun icinde donulecek
-
         response = client.execute_statement(Statement=insert_statement) 
         #response["Items"]  normalde birsey donmemesi lazim
 
@@ -160,45 +168,9 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
 
 
 
-# Advert yaratinca advert in id sinin owner inin advert ids kismina eklenmesi gerek onu yap !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-def create_advert(ownerid,date,quota,preference,filmid):
-    # PARAMETER TYPES
 
-    # ownerid -> int
-    # date -> str
-    # quota -> int
-    # preference -> str
-    # filmid -> int
-    
-    try:
 
-        advert_id = get_advert_id()
-        increment_advert_id()
-        registration_date = curr_time()
-        last_update_date = registration_date # Initially they are equal
-        attendee_ids = []
-        attendee_ids.append(ownerid)
-        status = "active"
 
-        TABLE_NAME = 'FakeAdvert'
-        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Date': {date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
-        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE" + "{" + item + "}"
-
-        result_dict = {} 
-
-        response = client.execute_statement(Statement=insert_statement) 
-        #response["Items"]  normalde birsey donmemesi lazim
-
-    except:
-        result_dict["Status"] = "Fail"
-        result_dict["Message"] = "An exception occured"
-        return result_dict
-
-    
-    result_dict["Status"] = "Success"
-    result_dict["Message"] = f"New advert successfully created with advert id:{advert_id}"
-    result_dict["AdvertID"] = advert_id
-    return result_dict
 
 
 
@@ -241,6 +213,44 @@ def retrieve_user(userid):
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+
+""" my_tokens = ["abc","def"]
+name = "Tony"
+surname = "Stark"
+username = "Iron Man"
+sex = "Yes"
+email = "start@gmail.com"
+age = 30
+location = "earth"
+bio = "my bio"
+photo = "this is a photo"
+likedfilms = []
+interests = ["interest 1", "interest 2"]
+about = "i am not about"
+
+
+
+
+tmp = create_user(my_tokens,name,surname,username,sex,email,age,location,bio,photo,likedfilms,interests,about)
+id = tmp["UserID"]
+print(tmp)
+print()
+print()
+print("***************")
+
+tmp = retrieve_user(id)
+tmp = tmp["Item"]
+print(tmp)
+ """
+
+
+
+
+
 
 
 # bu fonksiyon bir dictionary doner
@@ -408,6 +418,7 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
             if attribute in user.keys(): # we must get the old value
                 old = user[attribute]
             
+            result_dict["NewValue"] = new_value # onceden ekleniyor cunku str formatlayinca basina ve sonuna tirnak geliyor
             if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
                 new_value = "'" + new_value + "'"
 
@@ -423,12 +434,15 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
             result_dict["UserID"] = userid
             if old is not None:
                 result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
-            result_dict["NewValue"] = new_value
-
+            #result_dict["NewValue"] = new_value
             return result_dict
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
 
 
 # "AdvertIDs", "LikedFilms", "WatchedFilms"
@@ -584,6 +598,7 @@ def update_advert(advertid, attribute, new_value): # verilen user i verilen attr
             if attribute in advert.keys(): # we must get the old value
                 old = advert[attribute]
             
+            result_dict["NewValue"] = new_value
             if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
                 new_value = "'" + new_value + "'"
 
@@ -599,8 +614,7 @@ def update_advert(advertid, attribute, new_value): # verilen user i verilen attr
             result_dict["AdvertID"] = advertid
             if old is not None:
                 result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
-            result_dict["NewValue"] = new_value
-
+            #result_dict["NewValue"] = new_value
             return result_dict
 
     except:
@@ -722,14 +736,6 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-tmp = update_advert_list_attributes(1,"AttendeeIDs",3,"addos")
-print(tmp)
-print()
-print()
-print()
-
-tmp = retrieve_advert(1)
-print(tmp)
 
 
 
@@ -741,6 +747,54 @@ print(tmp)
 
 
 
+
+# Advert yaratinca advert in id sinin owner inin advert ids kismina eklenmesi gerek onu yap !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def create_advert(ownerid,date,quota,preference,filmid):
+    # PARAMETER TYPES
+
+    # ownerid -> int
+    # date -> str
+    # quota -> int
+    # preference -> str
+    # filmid -> int
+    
+    try:
+
+        advert_id = get_advert_id()
+        increment_advert_id()
+        registration_date = "'" + curr_time() + "'"
+        formatted_date = "'" + date + "'"
+        formatted_preference = "'" + preference + "'"
+        last_update_date = registration_date # Initially they are equal
+        attendee_ids = []
+        attendee_ids.append(ownerid)
+        status = "'active'"
+
+        TABLE_NAME = 'FakeAdvert'
+        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
+        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
+
+        result_dict = {} 
+
+        response = client.execute_statement(Statement=insert_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+        user_response = update_user_list_attributes(ownerid,"AdvertIDs",advert_id,"add") # bu ilanin owner i olan user in advert ids attribute una bu ilani ekler
+        if user_response["Status"] != "Success": # islem basarisiz
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"This advert cannot add to user:{ownerid}. You must delete advert:{advert_id} to provide consistency"
+            return result_dict
+
+
+    except:
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = "An exception occured"
+        return result_dict
+
+    
+    result_dict["Status"] = "Success"
+    result_dict["Message"] = f"New advert successfully created with advert id:{advert_id}"
+    result_dict["AdvertID"] = advert_id
+    return result_dict
 
 
 
