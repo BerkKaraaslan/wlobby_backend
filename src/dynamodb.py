@@ -295,7 +295,7 @@ def retrieve_advert(advertid):
 # "Item" ise eger varsa o id ile bulunan userin "AdvertIDs" listesini icerir
 # "UserID" eger user bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
 
-def retrieve_all_adverts(userid):
+def retrieve_users_all_adverts(userid):
     # PARAMETER TYPES
 
     # userid -> int
@@ -351,6 +351,32 @@ def retrieve_all_users():
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+def retrieve_all_adverts():
+
+    try:
+        TABLE_NAME = "FakeAdvert"
+        select_statement = f"SELECT * FROM {TABLE_NAME}"
+        response = client.execute_statement(Statement=select_statement)
+        items = response["Items"]
+
+        result_dict = {}
+        adverts = []
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All adverts successfully retrieved"
+        for item in items:
+            tmp = format_db_item(item)
+            adverts.append(tmp)
+
+        result_dict["Items"] = adverts
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
 
 
 
@@ -803,6 +829,56 @@ def create_advert(ownerid,date,quota,preference,filmid):
 
 
 
+def delete_advert(advertid):
+    # PARAMETER TYPES
+    # advertid -> int
+    
+    try:
+
+        TABLE_NAME = 'FakeAdvert'
+        result_dict = {} 
+        advert_query = retrieve_advert(advertid)
+        if advert_query["Status"] == "Fail": # bir sikinti var
+            result_dict["Status"] = advert_query["Status"]
+            result_dict["Message"] = advert_query["Message"]
+            result_dict["AdvertID"] = advertid
+            return result_dict
+
+        advert = advert_query["Item"]
+        ownerid = advert["OwnerID"] # owner inin AdvertIDs attribute undan bu ilani cikaracagiz
+
+        user_update_query = update_user_list_attributes(ownerid,"AdvertIDs",advertid,"remove")
+
+        if user_update_query["Status"] == "Fail": # bir sikinti var
+            result_dict["Status"] = user_update_query["Status"]
+            result_dict["Message"] = user_update_query["Message"]
+            result_dict["AdvertID"] = advertid
+            return result_dict
+
+
+        delete_statement = f"DELETE FROM {TABLE_NAME} WHERE AdvertID ={advertid}"
+        response = client.execute_statement(Statement=delete_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+
+        
+    except:
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = "An exception occured"
+        return result_dict
+
+    
+    result_dict["Status"] = "Success"
+    result_dict["Message"] = f"Advert with advert id:{advertid} is successfully deleted"
+    result_dict["AdvertID"] = advertid
+    return result_dict
+
+    # verilen id ye sahip butun advertlar silinecek
+
+    # adverti silmeden once advertin owner ina gidilir ve onun advert ids kisimindan bu id cikartilir
+
+    # daha sonra advert direk silinir
+
+    
 
 
 
@@ -826,6 +902,77 @@ def create_advert(ownerid,date,quota,preference,filmid):
 
 
 def delete_user(userid):
+
+    try:
+
+        TABLE_NAME = 'FakeUser'
+        result_dict = {} 
+        user_query = retrieve_user(userid)
+        if user_query["Status"] == "Fail": # bir sikinti var
+            result_dict["Status"] = user_query["Status"]
+            result_dict["Message"] = user_query["Message"]
+            result_dict["UserID"] = userid
+            return result_dict
+
+        user = user_query["Item"]
+        advert_ids = user["AdvertIDs"]
+
+        # butun advertlari getir
+        # gerekeni sil 
+        # gerekeni guncelle
+
+        advert_query = retrieve_all_adverts()
+        if advert_query["Status"] == "Fail": # bir sikinti var
+            result_dict["Status"] = advert_query["Status"]
+            result_dict["Message"] = advert_query["Message"]
+            result_dict["UserID"] = userid
+            return result_dict
+
+        adverts = advert_query["Items"]
+
+        for advert in adverts:
+            advert_id = advert["AdvertID"]
+            attendees = advert["AttendeeIDs"]
+            if advert_id in advert_ids: # eger bu user in bir adverti ise direk silinecek
+                response = delete_advert(advert_id)
+                if response["Status"] == "Fail": # bir sikinti var
+                    result_dict["Status"] = response["Status"]
+                    result_dict["Message"] = response["Message"]
+                    result_dict["UserID"] = userid
+                    return result_dict
+
+            elif userid in attendees: # eger user bu ilanda katilimci ise ilani guncelle yani katilimcilardan bu useri cikar
+                response = update_advert_list_attributes(advert_id,"AttendeeIDs",userid,"remove")
+                if response["Status"] == "Fail": # bir sikinti var
+                    result_dict["Status"] = response["Status"]
+                    result_dict["Message"] = response["Message"]
+                    result_dict["UserID"] = userid
+                    return result_dict
+
+        
+        delete_statement = f"DELETE FROM {TABLE_NAME} WHERE UserID ={userid}"
+        response = client.execute_statement(Statement=delete_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+        
+    except:
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = "An exception occured"
+        return result_dict
+
+    
+    result_dict["Status"] = "Success"
+    result_dict["Message"] = f"User with user id:{userid} is successfully deleted"
+    result_dict["UserID"] = userid
+    return result_dict
+
+
+
+
+
+
+
+    # delete_statement = "DELETE FROM FakeAdvert WHERE UserID=1"
+
     # bu fonksiyon verilen userid ye sahip user i silecek
 
     # ayrica butun advert lara bakip eger advert in attendee id lerinde bu user varsa oradan da silinmeli
@@ -838,18 +985,10 @@ def delete_user(userid):
 
     # 3) daha sonra o user silinecek
 
+    
 
-    pass
 
-def delete_advert(advertid):
 
-    # verilen id ye sahip butun advertlar silinecek
-
-    # adverti silmeden once advertin owner ina gidilir ve onun advert ids kisimindan bu id cikartilir
-
-    # daha sonra advert direk silinir
-
-    pass
 
 
 def delete_all_tables():
