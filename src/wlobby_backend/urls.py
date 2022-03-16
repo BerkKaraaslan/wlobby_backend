@@ -21,11 +21,21 @@ from django.urls import re_path  # from django.conf.urls import url
 from django.conf import settings
 from django.conf.urls.static import static
 
-from homepage.views import home_view
+from homepage.views import *
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view), # Default view for our homepage
+    path('get/user/',get_user_view), # user i don
+    path('get/user/adverts',get_user_adverts_view), # bu user in butun advertlarini don
+    path('get/users/',get_users_view), # butun userlari don
+    path('get/advert/',get_advert_view), # adverti don
+    path('get/adverts/',get_adverts_view),# butun advertlari don
+    path('update/user/',update_user_view), # user i update et
+    path('update/advert/',update_advert_view), # advert i update et
+    
+    # bir tane default redirection URL i koy !!!
 
 #    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
 #    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
