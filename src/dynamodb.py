@@ -1,8 +1,8 @@
 import boto3
-
 from id_generator import *
 from current_time import *
 
+INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
 with open('access_keys.txt') as f:
     lines = f.readlines()
@@ -12,16 +12,6 @@ AWS_SECRET_ACCESS_KEY = lines[1].rstrip()
 DEFAULT_REGION = "us-east-1" # AWS wants a region. In my case it is "us-east-1"
 
 client = boto3.client('dynamodb', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_access_key = AWS_SECRET_ACCESS_KEY, region_name = DEFAULT_REGION)
-
-
-# burada bir fonksiyon olacak connect gibi bir isimde ve program baslayinca o 1 defa cagrilacak
-# her seferinde dosyadan okuma ve db ye baglanma islemleri yapilmayacak
-
-
-def connect():
-    pass
-
-
 
 def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevirir
                           # Parametre olarak bir dictionary alir ve cevap olarak yine bir dictionary doner
@@ -53,61 +43,6 @@ def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevi
 
     return formatted_item
 
-
-
-""" def test_format_user():
-    
-
-    select_statement = "SELECT * FROM FakeAdvert WHERE AdvertID=1"
-
-    
-    response = client.execute_statement(Statement=select_statement) 
-
-    formatted_response = format_user(response["Items"][0])
-
-    #formatted_response = format_user({}) 
-
-    print("This is type of formatted response:" + str(type(formatted_response)))
-    print()
-    #print(formatted_response)
-
-    for key in formatted_response.keys():
-        print(formatted_response[key])
-        print("This is type of a value" + str(type(formatted_response[key])))
-        print()
-        print()
-
-
-    # sadece list veya set olanlarda yaziyor
-    # list ler icin direk dictionary nin values() yapilabilir
-    # her dict icin values cagirilir ve bunlar bir list te tutulup en son nihai value olarak bizim key e yazilir
-
-    # o list icinde gezip her dict icin values()[0] i diyecegiz. 
-
- """
-
-
-
-
-
-
-
-
-
-
-
-# CRUD Functions
-
-
-
-
-# CREATE Functions
-
-
-
-
-
-INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
 def create_user(authtokens,name,surname,username,sex,email,age,location,bio,profilephoto,likedfilms,interests,about):
     # PARAMETER TYPES
@@ -160,31 +95,11 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
         result_dict["Message"] = "An exception occured"
         return result_dict
 
-    
     result_dict["Status"] = "Success"
     result_dict["Message"] = f"New user successfully created with user id:{user_id}"
     result_dict["UserID"] = user_id
     return result_dict
 
-
-
-
-
-
-
-
-
-# RETRIEVE Functions
-
-
-
-
-
-# bu fonksiyon bir dictionary doner
-# bu dictionary de "Status" islemin durumunu
-# "Message" aciklamayi
-# "Item" ise eger varsa o id ile bulunan user i bir dictionary olarak doner
-# "UserID" eger user bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
 
 def retrieve_user(userid):
     # PARAMETER TYPES
@@ -215,55 +130,10 @@ def retrieve_user(userid):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-
-
-
-""" my_tokens = ["abc","def"]
-name = "Tony"
-surname = "Stark"
-username = "Iron Man"
-sex = "Yes"
-email = "start@gmail.com"
-age = 30
-location = "earth"
-bio = "my bio"
-photo = "this is a photo"
-likedfilms = []
-interests = ["interest 1", "interest 2"]
-about = "i am not about"
-
-
-
-
-tmp = create_user(my_tokens,name,surname,username,sex,email,age,location,bio,photo,likedfilms,interests,about)
-id = tmp["UserID"]
-print(tmp)
-print()
-print()
-print("***************")
-
-tmp = retrieve_user(id)
-tmp = tmp["Item"]
-print(tmp)
- """
-
-
-
-
-
-
-
-# bu fonksiyon bir dictionary doner
-# bu dictionary de "Status" islemin durumunu
-# "Message" aciklamayi
-# "Item" ise eger varsa o id ile bulunan advert i bir dictionary olarak doner
-# "AdvertID" eger advert bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
-
 def retrieve_advert(advertid):
     # PARAMETER TYPES
 
     # advertid -> int
-
     try:
         TABLE_NAME = "FakeAdvert"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
@@ -288,18 +158,10 @@ def retrieve_advert(advertid):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-
-# bu fonksiyon bir dictionary doner
-# bu dictionary de "Status" islemin durumunu
-# "Message" aciklamayi
-# "Item" ise eger varsa o id ile bulunan userin "AdvertIDs" listesini icerir
-# "UserID" eger user bulunamadi ise bu attribute hangi id (parametre) ile bulunamadigini gosterir
-
 def retrieve_users_all_adverts(userid):
     # PARAMETER TYPES
 
     # userid -> int
-
     try:
         TABLE_NAME = "FakeUser"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
@@ -323,11 +185,6 @@ def retrieve_users_all_adverts(userid):
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
 
-
-# bu fonksiyon bir dictionary doner
-# bu dictionary de "Status" islemin durumunu
-# "Message" aciklamayi
-# "Items" ise butun userlari bir dictionary listesi halinde doner. her user bir dictionary dir
 
 def retrieve_all_users():
 
@@ -375,39 +232,6 @@ def retrieve_all_adverts():
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
-
-
-
-
-
-
-# UPDATE Functions
-
-
-# butun normal attribute lar icin update fonksiyonlari olacak hem user hem de advert icin
-
-# Ayrica user in liked films lerine film ekle veya liked films lerinden film cikar gibi fonksiyonlar da olacak
-
-# Aybi sekilde watched films ve AdvertIDs icine bir seyler ekleme ve cikarma fonksiyonlari da olacak
-
-# Ayrica advert in da attendeıds kismi icin update fonksiyonu olacak
-
-# cikar kisimlari  delete functions bolomunde olacak
-
-# bir update oldugu zaman hem user hem de advert de lastupdatedate current time ile guncellenecek
-
-
-# user icin gerekli update fonksiyonlari
-
-
-# update authentication tokens, name, surname, username, sex, email, age, location, bio, photo, about, interests
-# yukaridaki attributelar update sirasinda direk overwrite edilecek
-# her update fonksiyonunda lust update date guncellenecek !!!!
-
-
-
-
-
 
 
 # bu fonksiyon user in "UserID", "AdvertIDs", "LikedFilms", "WatchedFilms" disinda kalan butun attribute larini update eder.
@@ -465,9 +289,6 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
-
-
-
 
 
 
@@ -578,24 +399,6 @@ def update_user_list_attributes(userid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-
-
-
-
-
-# advert icinde update fonksiyonlari olmali
-
-# 1 tane generic olacak bu AttendeeIDs disinda hepsini update edecek
-# attende ids i de update edecek ancak direk overwrite edecek
-
-# 1 tane de attende id s e ekleme ve cikarma yapan bir fonksiyon olacak
-
-
-
-
-
-
-
 def update_advert(advertid, attribute, new_value): # verilen user i verilen attribute ismini new value ile update edecek
     # PARAMETER TYPES
 
@@ -647,15 +450,6 @@ def update_advert(advertid, attribute, new_value): # verilen user i verilen attr
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-
-
-
-
-
-
-
-
-
 def update_advert_list_attributes(advertid, attribute, value, op_type):
     # PARAMETER TYPES
 
@@ -663,7 +457,6 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
     # attribute -> str
     # value -> it could be any valid attribute type
     # op_type -> str  only valid values are "add" and "remove" !
-
 
     # attribute str olarak hangi parametrenin update edilecegini tutacak
     # value herhangi bir type da add veya remove yapilacak item i tutacak
@@ -762,19 +555,6 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# Advert yaratinca advert in id sinin owner inin advert ids kismina eklenmesi gerek onu yap !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 def create_advert(ownerid,date,quota,preference,filmid):
     # PARAMETER TYPES
 
@@ -810,23 +590,15 @@ def create_advert(ownerid,date,quota,preference,filmid):
             result_dict["Message"] = f"This advert cannot add to user:{ownerid}. You must delete advert:{advert_id} to provide consistency"
             return result_dict
 
-
     except:
         result_dict["Status"] = "Fail"
         result_dict["Message"] = "An exception occured"
         return result_dict
 
-    
     result_dict["Status"] = "Success"
     result_dict["Message"] = f"New advert successfully created with advert id:{advert_id}"
     result_dict["AdvertID"] = advert_id
     return result_dict
-
-
-
-
-
-
 
 
 def delete_advert(advertid):
@@ -860,7 +632,6 @@ def delete_advert(advertid):
         response = client.execute_statement(Statement=delete_statement) 
         #response["Items"]  normalde birsey donmemesi lazim
 
-        
     except:
         result_dict["Status"] = "Fail"
         result_dict["Message"] = "An exception occured"
@@ -871,34 +642,6 @@ def delete_advert(advertid):
     result_dict["Message"] = f"Advert with advert id:{advertid} is successfully deleted"
     result_dict["AdvertID"] = advertid
     return result_dict
-
-    # verilen id ye sahip butun advertlar silinecek
-
-    # adverti silmeden once advertin owner ina gidilir ve onun advert ids kisimindan bu id cikartilir
-
-    # daha sonra advert direk silinir
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-# DELETE Functions
-
-# Normal attributelar icin delete fonksiyonu yazilmayacak
-
-# dynamodb de olmayan bir item i silmeyece calistigimizda error vermiyor
-# dolayısıyla for ile 1 den get_user_id veya get_advert_id ye kadar gecebiliriz
-
-
 
 
 def delete_user(userid):
@@ -966,111 +709,140 @@ def delete_user(userid):
     return result_dict
 
 
-
-
-
-
-
-    # delete_statement = "DELETE FROM FakeAdvert WHERE UserID=1"
-
-    # bu fonksiyon verilen userid ye sahip user i silecek
-
-    # ayrica butun advert lara bakip eger advert in attendee id lerinde bu user varsa oradan da silinmeli
-
-    # ayrica bu user in owner i oldugu butun ilanlar da silinmeli
-
-    # 1) once o user in advertıds listesindeki butun advertlar silinmeli cunku bu user o advertlarin owner i ve artik sistemde bulunmayacak
-
-    # 2) advertlar direk olarak silinebilir attendee ler ile ilgili bir sey yapmaya gerek yok. İlerde istenirse bu attendee lere bildirim vs atilabilir
-
-    # 3) daha sonra o user silinecek
-
-    
-
-
-
-
-
 def delete_all_tables():
     
-    # database de bulunan butun tablolari siler
+    try:
 
-    # bunu yapma yolu id_generator dan guncel user ve advert id leri alip for ile 1 den oraya kadar her biri icin silme requesti atilir
+        adverts_query = retrieve_all_adverts()
+        result_dict = {}
+        if adverts_query["Status"] == "Fail": # fail etti
+            result_dict["Status"] = adverts_query["Status"]
+            result_dict["Message"] = adverts_query["Message"]
+            return result_dict
 
-    # butun tablelar temizlendigi icin id_generator in initializeids fonksiyonu cagirilir
-    
-    pass
+        adverts = adverts_query["Items"]
+
+        for advert in adverts: # butun advertlar icin
+
+            advertid = advert["AdvertID"]
+            advert_delete_query = delete_advert(advertid)
+            if advert_delete_query["Status"] == "Fail": # fail etti
+                result_dict["Status"] = advert_delete_query["Status"]
+                result_dict["Message"] = advert_delete_query["Message"]
+                return result_dict
+
+        # donguden ciktiginda butun advertlari silmis demektir
+
+        users_query = retrieve_all_users()
+        result_dict = {}
+        if users_query["Status"] == "Fail": # fail etti
+            result_dict["Status"] = users_query["Status"]
+            result_dict["Message"] = users_query["Message"]
+            return result_dict
+
+        users = users_query["Items"]
+
+        for user in users: # butun userlar icin
+
+            userid = user["UserID"]
+            user_delete_query = delete_user(userid)
+            if user_delete_query["Status"] == "Fail": # fail etti
+                result_dict["Status"] = user_delete_query["Status"]
+                result_dict["Message"] = user_delete_query["Message"]
+                return result_dict
+
+        initialize_user_id() # eger butun advertlar ve userlar silindi ise idler initialize edilebilir ve tekrardan user ve advertlara id vermeye 1 den baslanabilir
+        initialize_advert_id() 
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All tables successfully deleted"
+        return result_dict
+        
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
 
 # ONEMLİ !!!!!   delete_all_users tarzinda bir fonksiyon yok cunku butun userlar silindigi zaman advertlar anlamsiz olur
 #                dolayisiyla userlar silindigi zaman advertlarida silmek gerekir.
 
-
 def delete_all_adverts():
 
-    # bu fonksiyon butun advertlari siler ve butun userlarin advertids attributelarini bos liste yapar.
+    try:
 
-    # ayrica id_generator in initialize advert ids fonksiyonu kullanilarak advert id degeri initialize edilir
+        adverts_query = retrieve_all_adverts()
+        result_dict = {}
+        if adverts_query["Status"] == "Fail": # fail etti
+            result_dict["Status"] = adverts_query["Status"]
+            result_dict["Message"] = adverts_query["Message"]
+            return result_dict
 
-    pass
+        adverts = adverts_query["Items"]
+
+        for advert in adverts: # butun advertlar icin
+
+            advertid = advert["AdvertID"]
+            advert_delete_query = delete_advert(advertid)
+            if advert_delete_query["Status"] == "Fail": # fail etti
+                result_dict["Status"] = advert_delete_query["Status"]
+                result_dict["Message"] = advert_delete_query["Message"]
+                return result_dict
+
+        # donguden ciktiginda butun advertlari silmis demektir
+
+        users_query = retrieve_all_users()
+        if users_query["Status"] == "Fail": # fail etti
+            result_dict["Status"] = users_query["Status"]
+            result_dict["Message"] = users_query["Message"]
+            return result_dict
+
+        users = users_query["Items"]
+
+        for user in users:
+
+            userid = user["UserID"]
+            user_update_query = update_user(userid,"AdvertIDs",[]) # userin AdvertIDs attribute u bos liste yapilir
+            if user_update_query["Status"] == "Fail": # fail etti
+                result_dict["Status"] = user_update_query["Status"]
+                result_dict["Message"] = user_update_query["Message"]
+                return result_dict
+
+            user_update_query = update_user(userid, "AttendedAdverts",[]) # userin AttendedAdverts attribute unu da bos liste yapacak
+            if user_update_query["Status"] == "Fail": # fail etti
+                result_dict["Status"] = user_update_query["Status"]
+                result_dict["Message"] = user_update_query["Message"]
+                return result_dict
 
 
+        initialize_advert_id() # eger butun advertlar silindi ise advert id initialize edilebilir ve tekrardan advertlara id vermeye 1 den baslanabilir
+            
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All adverts successfully deleted"
+        return result_dict
+        
 
-#response = client.get_item( # Now this table contains just dummy data
-#    TableName='Student',
-#    Key={
-#        "StudentID":{
-#            "N": "1"
-#        }
-#    })
-
-
-
-
-# FakeUser tablosu  UserID partition key i type i number yine us east 1 icin yaratildi !!!
-#
-# FakeAdvert tablosu AdvertID partition key i type i number yine us east 1 icin yaratildi !!!
-#
-#
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
 
 
-#test_statement = "SELECT * FROM FakeUser"    it works
- 
-#test_statement_2 = "SELECT * FROM FakeAdvert"  it works
-
-#response = client.execute_statement(Statement=test_statement)  it works
- 
-#print(response)  it works
-
-#response = client.execute_statement(Statement=test_statement_2) it works
-
-#print(response)   it works
-
-#statement = "SELECT * FROM Student WHERE StudentID=0" # IT WORKS !!!
-
+# Asagida sadece tabloya DUMMY deger eklemeye yarayan fonksiyonlar vardir. 
+# Bunlar normalde kullanilmayacaktir.
+# ilerleyen asamalarda silineceklerdir
 
 def insert_user_values():
 
     values = []
 
-    # "'UserID':1, 'CognitoAuthTokens':['access token of bkaslan','refresh token of bkaslan'], 'Name':'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs': [1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests': ['Action', 'Thriller'], 'About':'This is an about section of bkaslan' ")                                                                           
-
-    # calisiyorrr     values.append("'UserID': 1, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
-
-    user1 = "'UserID': 1, 'CognitoAuthTokens': ['access token of bkaslan','refresh token of bkaslan'], 'Name': 'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs':[1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests':['Action', 'Thriller'], 'About':'This is an about section of bkaslan' "                                                                        
-    user2 = "'UserID': 2, 'CognitoAuthTokens': ['access token of sceran','refresh token of sceran'], 'Name': 'Suleyman', 'Surname':'Ceran', 'Username':'sceran', 'AdvertIDs':[], 'Sex':'male', 'Email':'sceran@gmail.com', 'Age':21, 'Location':'Ankara-TUR', 'Bio':'This is a bio of sceran', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400,500], 'WatchedFilms':[300,500,600,100,400], 'RegistrationDate':'2022-01-01 12:35:45.000000', 'LastLogIn':'2022-05-15 23:59:58.171633',  'LogInCount':50, 'Interests':['Drama', 'Horror'], 'About':'This is an about section of sceran' "                                                                        
-    user3 = "'UserID': 3, 'CognitoAuthTokens': ['access token of opolat','refresh token of opolat'], 'Name': 'Omer Faruk', 'Surname':'Polat', 'Username':'opolat', 'AdvertIDs':[6], 'Sex':'male', 'Email':'opolat@gmail.com', 'Age':22, 'Location':'Istanbul-TUR', 'Bio':'This is a bio of opolat', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[400,500,600], 'WatchedFilms':[100,200,300,400,500,600], 'RegistrationDate':'2022-11-27 01:00:17.000000', 'LastLogIn':'2022-11-30 14:20:03.171633',  'LogInCount':18, 'Interests':['Drama', 'Horror', 'Comedy'], 'About':'This is an about section of opolat'"
-    user4 = "'UserID': 4, 'CognitoAuthTokens': ['access token of omujde','refresh token of omujde'], 'Name': 'Ozan', 'Surname':'Mujde', 'Username':'omujde', 'AdvertIDs':[], 'Sex':'male', 'Email':'omujde@gmail.com', 'Age':21, 'Location':'Izmir-TUR', 'Bio':'This is a bio of omujde', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100], 'WatchedFilms':[100,200,500], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':150, 'Interests':['Dark Humor', 'Horror'], 'About':'This is an about section of omujde'"
-    user5 = "'UserID': 5, 'CognitoAuthTokens': ['access token of byalcin','refresh token of byalcin'], 'Name': 'Bugra', 'Surname':'Yalcin', 'Username':'byalcin', 'AdvertIDs':[], 'Sex':'male', 'Email':'byalcin@gmail.com', 'Age':20, 'Location':'Ankara-TUR', 'Bio':'This is a bio of byalcin', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200], 'WatchedFilms':[100,180,200], 'RegistrationDate':'2022-07-06 03:47:59.161723', 'LastLogIn':'2022-07-06 03:47:59.161723',  'LogInCount':1, 'Interests':['Action', 'Comics'], 'About':'This is an about section of byalcin'"
-    user6 = "'UserID': 6, 'CognitoAuthTokens': ['access token of cbloom','refresh token of cbloom'], 'Name': 'Casey', 'Surname':'Bloom', 'Username':'cbloom', 'AdvertIDs':[], 'Sex':'other', 'Email':'cbloom@gmail.com', 'Age':23, 'Location':'Berlin-GER', 'Bio':'This is a bio of cbloom', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,500], 'WatchedFilms':[180,100,300,500,400], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':61, 'Interests':['Horror', 'Anime'], 'About':'This is an about section of cbloom'"
-    user7 = "'UserID': 7, 'CognitoAuthTokens': ['access token of mcartney','refresh token of mcartney'], 'Name': 'Monica', 'Surname':'Cartney', 'Username':'mcartney', 'AdvertIDs':[2,5], 'Sex':'female', 'Email':'mcartney@gmail.com', 'Age':20, 'Location':'Berlin-GER', 'Bio':'This is a bio of mcartney', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[150,100,500], 'WatchedFilms':[150,100,500], 'RegistrationDate':'2021-06-06 09:22:35.101220', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':12, 'Interests':['Drama', 'Biography'], 'About':'This is an about section of mcartney'"
-    user8 = "'UserID': 8, 'CognitoAuthTokens': ['access token of dson','refresh token of dson'], 'Name': 'David', 'Surname':'Son', 'Username':'dson', 'AdvertIDs':[], 'Sex':'other', 'Email':'dson@gmail.com', 'Age':28, 'Location':'London-ENG', 'Bio':'This is a bio of dson', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,200], 'WatchedFilms':[180,200], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-01-31 23:44:12.131739',  'LogInCount':31, 'Interests':['Cartoon'], 'About':'This is an about section of dson'"
-    user9 = "'UserID': 9, 'CognitoAuthTokens': ['access token of edoe','refresh token of edoe'], 'Name': 'Emma', 'Surname':'Doe', 'Username':'edoe', 'AdvertIDs':[], 'Sex':'female', 'Email':'edoe@gmail.com', 'Age':19, 'Location':'London-ENG', 'Bio':'This is a bio of edoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200,400], 'WatchedFilms':[200,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':72, 'Interests':['Dc', 'Marvel'], 'About':'This is an about section of edoe'"
-    user10 = "'UserID': 10, 'CognitoAuthTokens': ['access token of jdoe','refresh token of jdoe'], 'Name': 'James', 'Surname':'Doe', 'Username':'jdoe', 'AdvertIDs':[4], 'Sex':'male', 'Email':'jdoe@gmail.com', 'Age':24, 'Location':'London-ENG', 'Bio':'This is a bio of jdoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,150,200,400], 'WatchedFilms':[180,150,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':60, 'Interests':['Civil War', 'Cold War'], 'About':'This is an about section of jdoe'"
-
-
-    # bu sekilde her useri ekle !!!
-
-
+    user1 = "'UserID': 1, 'CognitoAuthTokens': ['access token of bkaslan','refresh token of bkaslan'], 'Name': 'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs':[1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests':['Action', 'Thriller'], 'About':'This is an about section of bkaslan' ,'AttendedAdverts': [100,200,300]"                                                                        
+    user2 = "'UserID': 2, 'CognitoAuthTokens': ['access token of sceran','refresh token of sceran'], 'Name': 'Suleyman', 'Surname':'Ceran', 'Username':'sceran', 'AdvertIDs':[], 'Sex':'male', 'Email':'sceran@gmail.com', 'Age':21, 'Location':'Ankara-TUR', 'Bio':'This is a bio of sceran', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400,500], 'WatchedFilms':[300,500,600,100,400], 'RegistrationDate':'2022-01-01 12:35:45.000000', 'LastLogIn':'2022-05-15 23:59:58.171633',  'LogInCount':50, 'Interests':['Drama', 'Horror'], 'About':'This is an about section of sceran' ,'AttendedAdverts': [100,200,300]"                                                                        
+    user3 = "'UserID': 3, 'CognitoAuthTokens': ['access token of opolat','refresh token of opolat'], 'Name': 'Omer Faruk', 'Surname':'Polat', 'Username':'opolat', 'AdvertIDs':[6], 'Sex':'male', 'Email':'opolat@gmail.com', 'Age':22, 'Location':'Istanbul-TUR', 'Bio':'This is a bio of opolat', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[400,500,600], 'WatchedFilms':[100,200,300,400,500,600], 'RegistrationDate':'2022-11-27 01:00:17.000000', 'LastLogIn':'2022-11-30 14:20:03.171633',  'LogInCount':18, 'Interests':['Drama', 'Horror', 'Comedy'], 'About':'This is an about section of opolat' ,'AttendedAdverts': [100,200,300]"
+    user4 = "'UserID': 4, 'CognitoAuthTokens': ['access token of omujde','refresh token of omujde'], 'Name': 'Ozan', 'Surname':'Mujde', 'Username':'omujde', 'AdvertIDs':[], 'Sex':'male', 'Email':'omujde@gmail.com', 'Age':21, 'Location':'Izmir-TUR', 'Bio':'This is a bio of omujde', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100], 'WatchedFilms':[100,200,500], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':150, 'Interests':['Dark Humor', 'Horror'], 'About':'This is an about section of omujde' ,'AttendedAdverts': [100,200,300]"
+    user5 = "'UserID': 5, 'CognitoAuthTokens': ['access token of byalcin','refresh token of byalcin'], 'Name': 'Bugra', 'Surname':'Yalcin', 'Username':'byalcin', 'AdvertIDs':[], 'Sex':'male', 'Email':'byalcin@gmail.com', 'Age':20, 'Location':'Ankara-TUR', 'Bio':'This is a bio of byalcin', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200], 'WatchedFilms':[100,180,200], 'RegistrationDate':'2022-07-06 03:47:59.161723', 'LastLogIn':'2022-07-06 03:47:59.161723',  'LogInCount':1, 'Interests':['Action', 'Comics'], 'About':'This is an about section of byalcin' ,'AttendedAdverts': [100,200,300]"
+    user6 = "'UserID': 6, 'CognitoAuthTokens': ['access token of cbloom','refresh token of cbloom'], 'Name': 'Casey', 'Surname':'Bloom', 'Username':'cbloom', 'AdvertIDs':[], 'Sex':'other', 'Email':'cbloom@gmail.com', 'Age':23, 'Location':'Berlin-GER', 'Bio':'This is a bio of cbloom', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,500], 'WatchedFilms':[180,100,300,500,400], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':61, 'Interests':['Horror', 'Anime'], 'About':'This is an about section of cbloom' ,'AttendedAdverts': [100,200,300]"
+    user7 = "'UserID': 7, 'CognitoAuthTokens': ['access token of mcartney','refresh token of mcartney'], 'Name': 'Monica', 'Surname':'Cartney', 'Username':'mcartney', 'AdvertIDs':[2,5], 'Sex':'female', 'Email':'mcartney@gmail.com', 'Age':20, 'Location':'Berlin-GER', 'Bio':'This is a bio of mcartney', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[150,100,500], 'WatchedFilms':[150,100,500], 'RegistrationDate':'2021-06-06 09:22:35.101220', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':12, 'Interests':['Drama', 'Biography'], 'About':'This is an about section of mcartney' ,'AttendedAdverts': [100,200,300]"
+    user8 = "'UserID': 8, 'CognitoAuthTokens': ['access token of dson','refresh token of dson'], 'Name': 'David', 'Surname':'Son', 'Username':'dson', 'AdvertIDs':[], 'Sex':'other', 'Email':'dson@gmail.com', 'Age':28, 'Location':'London-ENG', 'Bio':'This is a bio of dson', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,200], 'WatchedFilms':[180,200], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-01-31 23:44:12.131739',  'LogInCount':31, 'Interests':['Cartoon'], 'About':'This is an about section of dson' ,'AttendedAdverts': [100,200,300]"
+    user9 = "'UserID': 9, 'CognitoAuthTokens': ['access token of edoe','refresh token of edoe'], 'Name': 'Emma', 'Surname':'Doe', 'Username':'edoe', 'AdvertIDs':[], 'Sex':'female', 'Email':'edoe@gmail.com', 'Age':19, 'Location':'London-ENG', 'Bio':'This is a bio of edoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200,400], 'WatchedFilms':[200,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':72, 'Interests':['Dc', 'Marvel'], 'About':'This is an about section of edoe' ,'AttendedAdverts': [100,200,300]"
+    user10 = "'UserID': 10, 'CognitoAuthTokens': ['access token of jdoe','refresh token of jdoe'], 'Name': 'James', 'Surname':'Doe', 'Username':'jdoe', 'AdvertIDs':[4], 'Sex':'male', 'Email':'jdoe@gmail.com', 'Age':24, 'Location':'London-ENG', 'Bio':'This is a bio of jdoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,150,200,400], 'WatchedFilms':[180,150,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':60, 'Interests':['Civil War', 'Cold War'], 'About':'This is an about section of jdoe' ,'AttendedAdverts': [100,200,300]"
 
     values.append(user1)
     values.append(user2)
@@ -1084,48 +856,14 @@ def insert_user_values():
     values.append(user10)
 
 
-
-
-
-    # 400 kilobaytin altindaki stringler tabloya koyulabiliyor. profile fotosu string olarak tutulacak.
-
-    # Profile fotosu string olarak kaydediliyor. onu string olarak kaydet ve alinca image e donusumu yap
-
-    # 
-
-
-
-
-    #values.append("'UserID': {'N':'1'}, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
-
-    insert_statement = "INSERT INTO FakeUser VALUE {" + values[0] + "}"
-
-    select_statement = "SELECT * FROM FakeUser"
-
-    delete_statement = "DELETE FROM FakeUser WHERE UserID=1"
-
-
     for i in range(10):
         temp_statement = "INSERT INTO FakeUser VALUE {" + values[i] + "}"
         response = client.execute_statement(Statement=temp_statement) 
 
-    #response = client.execute_statement(Statement=delete_statement) 
-
-    response = client.execute_statement(Statement=select_statement) 
-
-    print(response["Items"])
-
-
-
-#insert_user_values()
-
-
+    
 def insert_advert_values():
 
-    values = []
-
-                                                                             
-
+    values = []                                                                    
     advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100 "                                                                        
     advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150 "
     advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200 "
@@ -1134,12 +872,6 @@ def insert_advert_values():
     advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300 "
     advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500 "
     advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400 "
-
-
-   
-
-
-
     values.append(advert1)
     values.append(advert2)
     values.append(advert3)
@@ -1149,159 +881,6 @@ def insert_advert_values():
     values.append(advert7)
     values.append(advert8)
     
-  
-
-
-
-
-
-    # 400 kilobaytin altindaki stringler tabloya koyulabiliyor. profile fotosu string olarak tutulacak.
-
-    # Profile fotosu string olarak kaydediliyor. onu string olarak kaydet ve alinca image e donusumu yap
-
-    # 
-
-
-
-
-    #values.append("'UserID': {'N':'1'}, 'CognitoAuthTokens': {'L':['access token of bkaslan','refresh token of bkaslan']}, 'Name': {'S':'Berk'}, 'Surname':{'S':'Karaaslan'}, 'Username':{'S':'bkaslan'}, 'AdvertIDs': {'L':[1,3,7,8]}, 'Sex':{'S':'male'}, 'Email':{'S':'bkaslan@gmail.com'}, 'Age':{'N':'22'}, 'Location':{'S':'Ankara-TUR'}, 'Bio':{'S':'This is a bio of bkaslan'}, 'ProfilePhoto': {'B':'This is a string profile photo'}, 'LikedFilms':{'L':[100,400]}, 'WatchedFilms':{'L':[100,200,500,400]}, 'RegistrationDate':{'S':'2022-02-19 15:48:36.431698'}, 'LastLogIn':{'S':'2022-02-21 15:48:55.471318'},  'LogInCount':{'N':'10'}, 'Interests': {'L':['Action', 'Thriller']}, 'About':{'S':'This is an about section of bkaslan'} ")                                                                           
-
-    insert_statement = "INSERT INTO FakeAdvert VALUE {" + values[0] + "}"
-
-    select_statement = "SELECT * FROM FakeAdvert"
-
-    delete_statement = "DELETE FROM FakeAdvert WHERE UserID=1"
-
-
-    #for i in range(8):
-    #    temp_statement = "INSERT INTO FakeAdvert VALUE {" + values[i] + "}"
-    #    response = client.execute_statement(Statement=temp_statement) 
-
-    #response = client.execute_statement(Statement=delete_statement) 
-
-    response = client.execute_statement(Statement=select_statement) 
-
-    print(response["Items"])
-
-
-    
-
-
-#insert_advert_values()
-
-
-
-
-
-
-
-
-
-
-def insert_sample_user():
-
-    statement = "INSERT INTO FakeUser VALUE {" + "'UserID': 100, 'FavoriteFood':'Ice Cream'" + "}"
-    client.execute_statement(Statement=statement) 
-    select_statement = "SELECT * FROM FakeUser WHERE UserID=100"
-    response = client.execute_statement(Statement=select_statement) 
-
-    print(response["Items"][0]["FavoriteFood"]["S"])
-
-
-    
-    
-
-
-#insert_sample_user()
-
-
-
-
-
-
-
-# bir tane dummy user ekle ve bu user i geri cagir select ile
-# donen itemlerden istenen dictionary yi alma yontemi
-
-# [d for d in a if d['name'] == 'pluto']
-# burada a dedigimiz dictionary listesi
-# d ise tek dictionary yi listeye eklemek icin tmp variable
-# eger name attribute u pluto ise onu aliyor.
-
-
-
-
-
-statement = "SELECT * FROM Student" # IT WORKS !!!
-
-item = (2, 'Berk', 'Karaaslan', 20)
-
-statement2 = "INSERT INTO Student VALUE {'StudentID':2,'Name':'Berk', 'Surname':'Karaaslan','Age':20}" # It works !!!  This statement adds a new student to student table
-
-# statement2 ile Student tablosuna yeni bir entry ekledik 
-
-statement3 = "UPDATE Student SET Name='NotBerk' SET NewAttribute=10 WHERE Name='Berk' AND StudentID=2" # It works !!!  WHERE kisminda her key icin bir condition olmak zorunda eger studentıd kismi kaldirilirsa calismiyor
-
-# statement3 ile adi Berk ve ID si 2 olan kullanicinin adini NotBerk yaptik ve ona yeni bir attribute ekledik
-# evet sorgunun icinde yeni bir attribute eklenebiliyor.
-# link: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ql-reference.update.html
-# https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ql-reference.delete.html
-
-statement4 = "UPDATE Student SET Name='Berk' SET NewAttribute=10 WHERE Name='NotBerk' AND StudentID=2 OR StudentID!=2"
-
-#statement4 = "UPDATE Student SET Name='Berk' SET NewAttribute=10 WHERE Name='NotBerk' AND StudentID IN (SELECT StudentID FROM Student)"
-
-statement5 = "SELECT StudentID FROM Student"
-
-statement6 = "UPDATE Student REMOVE Name WHERE Name='NotBerk' AND StudentID=2" # It works !!! Bu statement ıd si 2 olan ve adi NotBerk olan satirdan "Name" attribute unu sildi
-# bir list veya set tarzi bir attribute un icinde belirli bir elemani silmeye calis
-
-
-# COK ONEMLI  !!!!   Burada Update ve remove islemlerinde where conditionı olarak mutlaka butun key attributelara bir deger girilmek zorunda
-# Yani bir key attribute un degeri bos birakilarak update ve remove yapilamaz ancak select ve bir attribute icin remove yapilabilir 
-# Insert statement ı normal bir sekilde yapilabilir onun icin ozel bir seye gerek yoktur.
-
-#response = client.execute_statement(Statement=statement) 
-
-#my_key_list = response["Items"]
-
-#my_keys = []
-
-#for i in my_key_list:
-#    my_keys.append(*i.values())
-
-#my_real_keys = []
-
-#for i in my_keys:
-#    my_real_keys.append(*i.values())
-
-#print(set(my_real_keys))    
-
-#response = client.execute_statement(Statement=statement4)
-
-
-# This response contains 2 part of information. "Item" and "ResponseMetadata"
-# "Item" is the meaningful part for us
-# We can use "Item" part like a json object. 
-
-#for i in response:
-#    print(i,"->", response[i])
-
-#meaningful_item = response["Items"] # It is a dictionary object, we can print all key-value pairs in this dictionary
-#Note: This dictionary's values are dictionary too. 
-
-#print(response["Items"])  
-
-#print(meaningful_item)
-
-#Surname {'S': 'Doe'}
-#Age {'N': '20'}
-#StudentID {'N': '1'}
-#Name {'S': 'John'}
-
-# Below lines are examples of meaningful_item's key-value pairs
-# Keys of this dictionaries are Attribute Type, ex: 'S' means String
-# Values of this dictionaries are actual values that comes from DynamoDB
-
-#for item in meaningful_item:
-#    print(item, meaningful_item[item])
+    for i in range(8):
+        temp_statement = "INSERT INTO FakeAdvert VALUE {" + values[i] + "}"
+        response = client.execute_statement(Statement=temp_statement) 
