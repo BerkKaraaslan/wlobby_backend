@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from dynamodb import *
 from django.http import request
 import json
-
 # Create your views here.
 
 def home_view(request):
@@ -25,8 +24,8 @@ def get_users_view(request):
     return HttpResponse(json.dumps(retrive_dict))
 
 def get_advert_view(request):
-    advert_id = request.GET.get('advertid')
-    retrive_dict = retrieve_advert(advert_id)
+    advertid = request.GET.get('advertid')
+    retrive_dict = retrieve_advert(advertid)
     return HttpResponse(json.dumps(retrive_dict))
 
 def get_adverts_view(request):
@@ -34,10 +33,16 @@ def get_adverts_view(request):
     return HttpResponse(json.dumps(retrive_dict))
 
 def update_user_view(request):
-    pass
+    user_id = request.GET.get('id')
+    attribute = request.GET.get('attribute')
+    new_value = request.GET.get('new_value')
+    retrive_dict = update_user(user_id,attribute,new_value)
+    return HttpResponse(json.dumps(retrive_dict))
+    
 
 def update_advert_view(request):
-    pass
-
-
-
+    advertid = request.GET.get('advertid')
+    attribute = request.GET.get('attribute')
+    new_value = request.GET.get('new_value')
+    retrive_dict = update_advert(advertid, attribute, new_value)
+    return HttpResponse(json.dumps(retrive_dict))
