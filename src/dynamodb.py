@@ -1,17 +1,11 @@
 import boto3
 from id_generator import *
 from current_time import *
-import os 
 
 INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
-file_path = os.path.abspath("access_keys.txt")
-print(file_path)
-with open(file_path) as f:
-    lines = f.readlines()
-
-AWS_ACCESS_KEY_ID = lines[0].rstrip()
-AWS_SECRET_ACCESS_KEY = lines[1].rstrip()
+AWS_ACCESS_KEY_ID = "AKIASCXGL6JSX2WDYG4Z"
+AWS_SECRET_ACCESS_KEY = "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"
 DEFAULT_REGION = "us-east-1" # AWS wants a region. In my case it is "us-east-1"
 
 client = boto3.client('dynamodb', aws_access_key_id = AWS_ACCESS_KEY_ID, aws_secret_access_key = AWS_SECRET_ACCESS_KEY, region_name = DEFAULT_REGION)
