@@ -4,7 +4,7 @@ from current_time import *
 
 INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
-with open('access_keys.txt') as f:
+with open('./access_keys.txt') as f:
     lines = f.readlines()
 
 AWS_ACCESS_KEY_ID = lines[0].rstrip()
