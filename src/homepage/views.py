@@ -11,20 +11,26 @@ def home_view(request):
 def get_user_view(request):
     user_id = request.GET.get('id')
     retrieve_dict= retrieve_user(user_id)
-    print(retrieve_dict)
+    #print(retrieve_dict)
     return HttpResponse(json.dumps(retrieve_dict))
 
 def get_user_adverts_view(request):
-    pass
+    user_id = request.GET.get('id')
+    retrive_dict = retrieve_users_all_adverts(user_id)
+    return HttpResponse(json.dumps(retrive_dict))
 
 def get_users_view(request):
-    pass
+    retrive_dict = retrieve_all_users()
+    return HttpResponse(json.dumps(retrive_dict))
 
 def get_advert_view(request):
-    pass
+    advert_id = request.GET.get('advertid')
+    retrive_dict = retrieve_advert(advert_id)
+    return HttpResponse(json.dumps(retrive_dict))
 
 def get_adverts_view(request):
-    pass
+    retrive_dict = retrieve_all_adverts()
+    return HttpResponse(json.dumps(retrive_dict))
 
 def update_user_view(request):
     pass
