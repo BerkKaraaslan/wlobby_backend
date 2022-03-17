@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render
 from django.http import HttpResponse
 from dynamodb import *
@@ -38,11 +39,36 @@ def update_user_view(request):
     new_value = request.GET.get('new_value')
     retrive_dict = update_user(user_id,attribute,new_value)
     return HttpResponse(json.dumps(retrive_dict))
-    
 
 def update_advert_view(request):
     advertid = request.GET.get('advertid')
     attribute = request.GET.get('attribute')
     new_value = request.GET.get('new_value')
     retrive_dict = update_advert(advertid, attribute, new_value)
+    return HttpResponse(json.dumps(retrive_dict))
+
+def update_user_list_attributes_view(request):
+    userid = request.GET.get('id')
+    attribute = request.GET.get('attribute')
+    value = request.GET.get('value')
+    op_type = request.GET.get('optype')
+    retrive_dict = update_user_list_attributes(userid, attribute, value, op_type)
+    return HttpResponse(json.dumps(retrive_dict))
+
+def update_advert_list_attributes_view(request):
+    advertid = request.GET.get('id')
+    attribute = request.GET.get('attribute')
+    value = request.GET.get('value')
+    op_type = request.GET.get('optype')
+    retrive_dict = update_user_list_attributes(advertid, attribute, value, op_type)
+    return HttpResponse(json.dumps(retrive_dict))
+
+def delete_user_view(request):
+    userid = request.GET.get('id')
+    retrive_dict = delete_user(userid)
+    return HttpResponse(json.dumps(retrive_dict))
+
+def delete_advert_view(request):
+    advertid = request.GET.get('advertid')
+    retrive_dict = delete_advert(advertid)
     return HttpResponse(json.dumps(retrive_dict))
