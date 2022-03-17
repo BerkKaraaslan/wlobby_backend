@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from dynamodb import *
 from django.http import request
 import json
+
 # Create your views here.
 
 def home_view(request):
