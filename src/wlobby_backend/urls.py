@@ -34,7 +34,12 @@ urlpatterns = [
     path('get/adverts/',get_adverts_view),# butun advertlari don
     path('update/user/',update_user_view), # user i update et
     path('update/advert/',update_advert_view), # advert i update et
-    
+    path('update/user/list',update_user_list_attributes_view), # userin list attr.unu update et
+    path('update/advert/list',update_advert_list_attributes_view), # advertin list attr.unu update et
+    path('delete/user',delete_user_view),
+    path('delete/advert',delete_advert_view),
+    path('create/user', create_user_view),
+    path('create/advert', create_advert_view)
     # bir tane default redirection URL i koy !!!
 
 #    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 

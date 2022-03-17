@@ -89,3 +89,13 @@ def create_user_view(request):
     about = request.GET.get('about')
     retrive_dict = create_user(authtokens,name,surname,username,sex,email,age,location,bio,profilephoto,likedfilms,interests,about)
     return HttpResponse(json.dumps(retrive_dict))
+
+def create_advert_view(request):
+    ownerid = request.GET.get('id')
+    date = request.GET.get('date')
+    quota = request.GET.get('quota')
+    preference = request.GET.get('preference')
+    filmid = request.GET.get('filmid')
+    retrive_dict = create_advert(ownerid,date,quota,preference,filmid)
+    return HttpResponse(json.dumps(retrive_dict))
+    
