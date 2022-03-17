@@ -1,10 +1,13 @@
 import boto3
 from id_generator import *
 from current_time import *
+import os 
 
 INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
 
-with open('./access_keys.txt') as f:
+file_path = os.path.abspath("access_keys.txt")
+print(file_path)
+with open(file_path) as f:
     lines = f.readlines()
 
 AWS_ACCESS_KEY_ID = lines[0].rstrip()
