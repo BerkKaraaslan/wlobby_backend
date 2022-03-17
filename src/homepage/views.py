@@ -96,6 +96,7 @@ def create_advert_view(request):
     quota = request.GET.get('quota')
     preference = request.GET.get('preference')
     filmid = request.GET.get('filmid')
-    retrive_dict = create_advert(ownerid,date,quota,preference,filmid)
+    createdate = request.GET.get('createdate')
+    retrive_dict = create_advert(ownerid,date,quota,preference,filmid,createdate)
     return HttpResponse(json.dumps(retrive_dict))
     
