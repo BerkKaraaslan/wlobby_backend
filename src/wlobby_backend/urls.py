@@ -31,18 +31,18 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view), # Default view for our homepage
     path('get/user/',get_user_view), # user i don
-    path('get/user/adverts',get_user_adverts_view), # bu user in butun advertlarini don
+    path('get/user/adverts/',get_user_adverts_view), # bu user in butun advertlarini don
     path('get/users/',get_users_view), # butun userlari don
     path('get/advert/',get_advert_view), # adverti don
     path('get/adverts/',get_adverts_view),# butun advertlari don
     path('update/user/',update_user_view), # user i update et
     path('update/advert/',update_advert_view), # advert i update et
-    path('update/user/list',update_user_list_attributes_view), # userin list attr.unu update et
-    path('update/advert/list',update_advert_list_attributes_view), # advertin list attr.unu update et
-    path('delete/user',delete_user_view),
-    path('delete/advert',delete_advert_view),
-    path('create/user', create_user_view),
-    path('create/advert/', create_advert_view),
+    path('update/user/list/',update_user_list_attributes_view), # userin list attr.unu update et
+    path('update/advert/list/',update_advert_list_attributes_view), # advertin list attr.unu update et
+    path('delete/user/',delete_user_view), # useri sil
+    path('delete/advert/',delete_advert_view), # adverti sil
+    path('create/user/', create_user_view), # useri yarat
+    path('create/advert/', create_advert_view), # adverti yarat
 
     path('redirection/', redirection_view),
     re_path(r'^.*$', RedirectView.as_view(url='redirection/', permanent=False), name='index') # This line redirects all wrong URL's to redirection page
@@ -66,3 +66,6 @@ if settings.DEBUG:
 
 
 
+# sonda slash / olmamali
+# ayrica redirect loop a takiliyor !!! 
+# onu cozmenin yolunu bul !!! sadece URL in son kismini degil URL in tamammini redirection a yonlendirsin

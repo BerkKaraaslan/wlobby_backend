@@ -73,13 +73,14 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
         increment_user_id()
         advert_ids = [] # Initially an empty list
         watched_films = []
+        attended_adverts = []
         registration_date = "'" + curr_time() + "'"
         last_log_in = registration_date # Initially they are equal
         log_in_count = INITIAL_LOGIN_VALUE
         last_update_date = registration_date # Initially they are equal
 
         TABLE_NAME = 'FakeUser'
-        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {formatted_name}, 'Surname': {formatted_surname}, 'Username': {formatted_username}, 'AdvertIDs': {advert_ids}, 'Sex': {formatted_sex}, 'Email': {formatted_email}, 'Age': {age}, 'Location': {formatted_location}, 'Bio': {formatted_bio}, 'ProfilePhoto': {formatted_photo}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {formatted_about}, 'LastUpdateDate': {last_update_date}"
+        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {formatted_name}, 'Surname': {formatted_surname}, 'Username': {formatted_username}, 'AdvertIDs': {advert_ids}, 'Sex': {formatted_sex}, 'Email': {formatted_email}, 'Age': {age}, 'Location': {formatted_location}, 'Bio': {formatted_bio}, 'ProfilePhoto': {formatted_photo}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {formatted_about}, 'LastUpdateDate': {last_update_date}, 'AttendedAdverts': {attended_adverts}"
         insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
 
         result_dict = {} # bunun icine status, message gibi attribute lar koy.
