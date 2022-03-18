@@ -207,6 +207,62 @@ def retrieve_all_users():
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
+def retrieve_all_users_with_name_and_surname(name=None,surname=None): # verilenleri dahil edecek
+    # PARAMETER TYPES
+
+    # name -> str (optional)
+    # surname -> str (optional)
+
+    try:
+
+        result_dict = {}
+        if name is None and surname is None: # eger parametre verilmedi ise
+            result_dict["Status"] = "Fail"
+            result_dict["Message"] = f"You must specify at least one of name and surname"
+            return result_dict
+
+        users_query = retrieve_all_users()
+        if users_query["Status"] == "Fail": # islem basarisiz
+            result_dict["Status"] = users_query["Status"]
+            result_dict["Message"] = users_query["Message"]
+            return result_dict
+
+        users = users_query["Items"]
+        users_with_name_and_surname = [] # name veya surname i iceren userlar
+
+        for user in users:
+            if name is None: # name None ise surname kesinlikle None degildir cunku oldugu senaryoyu kontrol ettik.
+                if user["Surname"] == surname: # name None oldugu icin eger Surname i ayni ise direk ekledik
+                    users_with_name_and_surname.append(user)
+                
+            else: # name None degil 
+                if surname is None: # surname None dolayisiyla sadece name e bakicaz
+                    if user["Name"] == name:
+                        users_with_name_and_surname.append(user)
+                
+                else: # burada hem name hem surname e bakicaz cunku ikiside None degil
+                    if user["Name"] == name and user["Surname"] == surname:
+                        users_with_name_and_surname.append(user)
+
+        if name is None:
+            formatted_name = 'None'
+        else:
+            formatted_name = name
+
+        if surname is None:
+            formatted_surname = 'None'
+        else:
+            formatted_surname = surname
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All users with name:{formatted_name} and surname:{formatted_surname} successfully retrieved"
+        result_dict["Items"] = users_with_name_and_surname
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
 def retrieve_all_adverts():
 
     try:
@@ -227,6 +283,37 @@ def retrieve_all_adverts():
         result_dict["Items"] = adverts
         return result_dict
 
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun ilanlari donecek
+    # PARAMETER TYPES
+
+    # filmid -> int
+
+    try:
+
+        result_dict = {}
+        adverts_query = retrieve_all_adverts()
+        if adverts_query["Status"] == "Fail": # islem basarisiz
+            result_dict["Status"] = adverts_query["Status"]
+            result_dict["Message"] = adverts_query["Message"]
+            result_dict["FilmID"] = filmid
+            return result_dict
+
+        adverts = adverts_query["Items"]
+        adverts_with_filmid = [] # filmid yi iceren advertlar
+
+        for advert in adverts:
+            if advert["FilmID"] == filmid: # eger id si ayni ise donecegimiz listeye adverti ekle
+                adverts_with_filmid.append(advert)
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"All adverts with filmid:{filmid} successfully retrieved"
+        result_dict["Items"] = adverts_with_filmid
+        return result_dict
+        
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
 
@@ -552,7 +639,7 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-def create_advert(ownerid,date,quota,preference,filmid):
+def create_advert(ownerid,date,quota,preference,filmid,description):
     # PARAMETER TYPES
 
     # ownerid -> int
@@ -560,7 +647,8 @@ def create_advert(ownerid,date,quota,preference,filmid):
     # quota -> int
     # preference -> str
     # filmid -> int
-    
+    # description -> str
+
     try:
 
         advert_id = get_advert_id()
@@ -568,13 +656,14 @@ def create_advert(ownerid,date,quota,preference,filmid):
         registration_date = "'" + curr_time() + "'"
         formatted_date = "'" + date + "'"
         formatted_preference = "'" + preference + "'"
+        formatted_description = "'" + description + "'"
         last_update_date = registration_date # Initially they are equal
         attendee_ids = []
         attendee_ids.append(ownerid)
         status = "'active'"
 
         TABLE_NAME = 'FakeAdvert'
-        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
+        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Description': {formatted_description}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
         insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
 
         result_dict = {} 
@@ -861,14 +950,14 @@ def insert_user_values():
 def insert_advert_values():
 
     values = []                                                                    
-    advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100 "                                                                        
-    advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150 "
-    advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200 "
-    advert4 = "'AdvertID': 4, 'OwnerID': 10, 'Date': '2022-02-28 12:30:00.000000', 'RegistrationDate':'2022-02-15 10:09:16.001234', 'LastUpdateDate':'2022-02-15 11:37:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [10,5,6,7,8], 'Status': 'Active', 'FilmID': 180 "
-    advert5 = "'AdvertID': 5, 'OwnerID': 7, 'Date': '2022-02-25 11:00:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-15 20:55:18.123456', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [7,2,9,16], 'Status': 'Active', 'FilmID': 100 "
-    advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300 "
-    advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500 "
-    advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400 "
+    advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description' "                                                                        
+    advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150, 'Description': 'this is description' "
+    advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200, 'Description': 'this is description' "
+    advert4 = "'AdvertID': 4, 'OwnerID': 10, 'Date': '2022-02-28 12:30:00.000000', 'RegistrationDate':'2022-02-15 10:09:16.001234', 'LastUpdateDate':'2022-02-15 11:37:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [10,5,6,7,8], 'Status': 'Active', 'FilmID': 180, 'Description': 'this is description' "
+    advert5 = "'AdvertID': 5, 'OwnerID': 7, 'Date': '2022-02-25 11:00:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-15 20:55:18.123456', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [7,2,9,16], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description' "
+    advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300, 'Description': 'this is description' "
+    advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500, 'Description': 'this is description' "
+    advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400, 'Description': 'this is description' "
     values.append(advert1)
     values.append(advert2)
     values.append(advert3)

@@ -23,6 +23,9 @@ from django.conf.urls.static import static
 
 from homepage.views import *
 
+from django.urls import re_path
+from django.views.generic.base import RedirectView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,7 +42,10 @@ urlpatterns = [
     path('delete/user',delete_user_view),
     path('delete/advert',delete_advert_view),
     path('create/user', create_user_view),
-    path('create/advert', create_advert_view)
+    path('create/advert/', create_advert_view),
+
+    path('redirection/', redirection_view),
+    re_path(r'^.*$', RedirectView.as_view(url='redirection/', permanent=False), name='index') # This line redirects all wrong URL's to redirection page
     # bir tane default redirection URL i koy !!!
 
 #    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 

@@ -1,4 +1,3 @@
-import re
 from django.shortcuts import render
 from django.http import HttpResponse
 from dynamodb import *
@@ -91,11 +90,27 @@ def create_user_view(request):
     return HttpResponse(json.dumps(retrive_dict))
 
 def create_advert_view(request):
-    ownerid = int(request.GET.get('id'))
-    date = str(request.GET.get('date'))
-    quota = int(request.GET.get('quota'))
-    preference = str(request.GET.get('preference'))
-    filmid = int(request.GET.get('filmid'))
-    retrive_dict = create_advert(ownerid,date,quota,preference,filmid)
-    return HttpResponse(json.dumps(retrive_dict))
+    try:
+        ownerid = int(request.GET.get('id',''))
+        if ownerid == '':
+            return HttpResponse(json.dumps({'Status':'Fail','Message':'You must specify the ownerid'}))
+        date = str(request.GET.get('date'))
+        quota = int(request.GET.get('quota'))
+        preference = str(request.GET.get('preference'))
+        filmid = int(request.GET.get('filmid'))
+        print("ownerid:" + ownerid)
+        print("date:" + date)
+        print("quota:" + quota)
+        print("preference:" + preference)
+        print("filmid:" + filmid)
+        retrive_dict = create_advert(ownerid,date,quota,preference,filmid)
+        return HttpResponse(json.dumps(retrive_dict))
+
+    except:
+        return HttpResponse(json.dumps({'Status':'Fail','Message':'You must specify the ownerid'}))
+
+
+def redirection_view(request):
+    response = {'Status':'Fail','Message':'This is default redirection message. You received this message because your URL is bad'}
+    return HttpResponse(json.dumps(response))
     
