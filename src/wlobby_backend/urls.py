@@ -46,7 +46,6 @@ urlpatterns = [
 
     path('redirection/', redirection_view),
     re_path(r'^.*$', RedirectView.as_view(url='redirection/', permanent=False), name='index') # This line redirects all wrong URL's to redirection page
-    # bir tane default redirection URL i koy !!!
 
 #    url(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
 #    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
