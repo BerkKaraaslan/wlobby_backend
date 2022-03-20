@@ -13,9 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from mylobby.views import *
 from django.contrib import admin
 from django.urls import path
-from mylobby.views import home_view
+
+from django.views.static import serve # These imports are for Heroku deployment
+from django.urls import re_path  # from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
+from mylobby.views import *
+from django.urls import re_path
+from django.views.generic.base import RedirectView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls)

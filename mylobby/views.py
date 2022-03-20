@@ -7,9 +7,11 @@ import requests
 from mylobby import decode_jwt
 from django.http import HttpResponse
 import json
-
-
-
+from django.shortcuts import render
+from dynamodb import *
+from django.http import request
+import json
+from django.shortcuts import render
 
 def home_view(request):
     try:
@@ -24,7 +26,7 @@ def home_view(request):
         if token is not None:
             userdata=decode_jwt.lamda_handler(token,None)
             response = HttpResponse(json.dumps({"Status": "Success", "Message": "User infos pass", "User_data": userdata}))
-        return token
+        return response
 
 
 
