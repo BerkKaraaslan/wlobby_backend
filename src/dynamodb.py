@@ -41,7 +41,20 @@ def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevi
     return formatted_item
 
 
-def create_user(authtokens,name,surname,username,sex,email,age,location,bio,profilephoto,likedfilms,interests,about):
+def validate_tokens(userid,tokens): 
+    # verilen user in tokenlari gercekten de tablodaki tokenlar ile ayni ise success seklinde bir dict donecek
+    # success dict gelince userin istedigi islem yapilacak
+    # aksi halde fail dict donecek
+    # fail seklinde dict gelince userin islemi yapilmadan fail dict i http response olarak donulecek
+    pass
+
+
+
+# SADECE email zorunlu arguman diger butun argumanlar opsiyonel
+def create_user(email,authtokens=None,name=None,surname=None,username=None,sex=None,age=None,location=None,bio=None,profilephoto=None,likedfilms=None,interests=None,about=None):
+    
+    # email disinda hepsi opsiyonel parametre
+    
     # PARAMETER TYPES
 
     # authtokens -> string list
@@ -60,15 +73,8 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
 
     try:
         
-        formatted_name = "'" + name + "'"
-        formatted_surname = "'" + surname + "'"
-        formatted_username = "'" + username + "'"
-        formatted_sex = "'" + sex + "'"
-        formatted_email = "'" + email + "'"
-        formatted_location = "'" + location + "'"
-        formatted_bio = "'" + bio + "'"
-        formatted_photo = "'" + profilephoto + "'"
-        formatted_about = "'" + about + "'"
+        item = ""
+
         user_id = get_user_id()
         increment_user_id()
         advert_ids = [] # Initially an empty list
@@ -78,26 +84,74 @@ def create_user(authtokens,name,surname,username,sex,email,age,location,bio,prof
         last_log_in = registration_date # Initially they are equal
         log_in_count = INITIAL_LOGIN_VALUE
         last_update_date = registration_date # Initially they are equal
+        formatted_email = "'" + email + "'"
 
+        item = item = f"'UserID': {user_id}, 'AdvertIDs': {advert_ids}, 'Email': {formatted_email}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'LastUpdateDate': {last_update_date}, 'AttendedAdverts': {attended_adverts}"
+
+        if name is not None:
+            formatted_name = "'" + name + "'"
+            item = item + f", 'Name':{formatted_name}"
+
+        if surname is not None:
+            formatted_surname = "'" + surname + "'"
+            item = item + f", 'Surname':{formatted_surname}"
+
+        if username is not None:
+            formatted_username = "'" + username + "'"
+            item = item + f", 'Username':{formatted_username}"
+
+        if sex is not None:
+            formatted_sex = "'" + sex + "'"
+            item = item + f", 'Sex':{formatted_sex}"
+
+        if age is not None:
+            age = int(age)
+            item = item + f", 'Age':{age}"
+
+        if location is not None:
+            formatted_location = "'" + location + "'"
+            item = item + f", 'Location':{formatted_location}"
+
+        if bio is not None:
+            formatted_bio = "'" + bio + "'"
+            item = item + f", 'Bio':{formatted_bio}"
+
+        if profilephoto is not None:
+            formatted_photo = "'" + profilephoto + "'"
+            item = item + f", 'ProfilePhoto':{formatted_photo}"
+
+        if about is not None:
+            formatted_about = "'" + about + "'"
+            item = item + f", 'About':{formatted_about}"
+
+        if authtokens is not None:
+            item = item + f", 'CognitoAuthTokens':{authtokens}"
+
+        if likedfilms is not None:
+            item = item + f", 'LikedFilms':{likedfilms}"
+
+        if interests is not None:
+            item = item + f", 'Interests':{interests}"
+
+        
         TABLE_NAME = 'FakeUser'
-        item = f"'UserID': {user_id}, 'CognitoAuthTokens': {authtokens}, 'Name': {formatted_name}, 'Surname': {formatted_surname}, 'Username': {formatted_username}, 'AdvertIDs': {advert_ids}, 'Sex': {formatted_sex}, 'Email': {formatted_email}, 'Age': {age}, 'Location': {formatted_location}, 'Bio': {formatted_bio}, 'ProfilePhoto': {formatted_photo}, 'LikedFilms': {likedfilms}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'Interests': {interests}, 'About': {formatted_about}, 'LastUpdateDate': {last_update_date}, 'AttendedAdverts': {attended_adverts}"
         insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
-
         result_dict = {} # bunun icine status, message gibi attribute lar koy.
         # user ıd vs de bunun icinde donulecek
         response = client.execute_statement(Statement=insert_statement) 
         #response["Items"]  normalde birsey donmemesi lazim
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"New user successfully created with user id:{user_id}"
+        result_dict["UserID"] = user_id
+        return result_dict
 
     except:
         result_dict["Status"] = "Fail"
         result_dict["Message"] = "An exception occured"
         return result_dict
 
-    result_dict["Status"] = "Success"
-    result_dict["Message"] = f"New user successfully created with user id:{user_id}"
-    result_dict["UserID"] = user_id
-    return result_dict
-
+    
 
 def retrieve_user(userid):
     # PARAMETER TYPES
@@ -105,6 +159,7 @@ def retrieve_user(userid):
     # userid -> int
 
     try:
+        userid = int(userid) # type casting gerekli !
         TABLE_NAME = "FakeUser"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
         response = client.execute_statement(Statement=select_statement)
@@ -133,6 +188,7 @@ def retrieve_advert(advertid):
 
     # advertid -> int
     try:
+        advertid = int(advertid)
         TABLE_NAME = "FakeAdvert"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
         response = client.execute_statement(Statement=select_statement)
@@ -161,6 +217,7 @@ def retrieve_users_all_adverts(userid):
 
     # userid -> int
     try:
+        userid = int(userid)
         TABLE_NAME = "FakeUser"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
         response = client.execute_statement(Statement=select_statement)
@@ -202,6 +259,36 @@ def retrieve_all_users():
             users.append(tmp)
 
         result_dict["Items"] = users
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+def retrieve_user_with_email(email): # email unique oldugu icin verilen email e sahip user i donecek
+    # PARAMETER TYPES
+
+    # email -> str
+
+    try:
+
+        user_query = retrieve_all_users()
+        result_dict = {}
+        if user_query["Status"] == "Fail": # fail etti
+            result_dict["Status"] = user_query["Status"]
+            result_dict["Message"] = user_query["Message"]
+            return result_dict
+
+        users = user_query["Items"]
+        for user in users:
+            if user["Email"] == email: # bu user donulecek
+                result_dict["Status"] = "Success"
+                result_dict["Message"] = f"User with email:{email} is successfully retrieved"
+                result_dict["Item"] = user
+                return result_dict
+            
+        result_dict["Status"] = "Fail"
+        result_dict["Message"] = f"No such user exist with email:{email}"
         return result_dict
 
     except:
@@ -295,6 +382,7 @@ def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun il
 
     try:
 
+        filmid = int(filmid) # parametre cast gereklidir
         result_dict = {}
         adverts_query = retrieve_all_adverts()
         if adverts_query["Status"] == "Fail": # islem basarisiz
@@ -338,6 +426,10 @@ def update_user(userid, attribute, new_value): # verilen user i verilen attribut
         response = client.execute_statement(Statement=select_statement)
         user = response["Items"]
         result_dict = {}
+
+        # LogInCount a bakilmadi !!!!!!!!
+        if attribute == "Age": # parametre cast gereklidir !
+            new_value = int(new_value)
 
         if len(user) == 0: # No such user exist
             result_dict["Status"] = "Fail"
@@ -397,6 +489,15 @@ def update_user_list_attributes(userid, attribute, value, op_type):
         response = client.execute_statement(Statement=select_statement)
         user = response["Items"]
         result_dict = {}
+
+        if attribute == "LikedFilms": # Yeni list attribute lar gelirse onlarin da kontrol edilmesi gerekir.
+            value = int(value)
+        elif attribute == "WatchedFilms":
+            value = int(value)
+        elif attribute == "AttendedAdverts":
+            value = int(value)
+        elif attribute == "AdvertIDs":
+            value = int(value)
 
         if len(user) == 0: # No such user exist
             result_dict["Status"] = "Fail"
@@ -498,6 +599,14 @@ def update_advert(advertid, attribute, new_value): # verilen user i verilen attr
         advert = response["Items"]
         result_dict = {}
 
+        if attribute == "FilmID": # Baska int tipinde attribute eklenirse bu islem gereklidir !
+            new_value = int(new_value)
+        elif attribute == "OwnerID":
+            new_value = int(new_value)
+        elif attribute == "Quota":
+            new_value = int(new_value)
+        
+
         if len(advert) == 0: # No such advert exist
             result_dict["Status"] = "Fail"
             result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
@@ -548,11 +657,19 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
     # op_type ise string olarak "add" veya "remove" degerlerini alabilecek
 
     try:
+        # update fonksiyonlarinda disardan parametre gelince string gibi davraniyor 
+        # gelebilecek parametreleri kontrol et ve type cast yap
+        # advertin list attribute u attendeeIDs ve pending requests var
         TABLE_NAME = "FakeAdvert"
         select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
         response = client.execute_statement(Statement=select_statement)
         advert = response["Items"]
         result_dict = {}
+
+        if attribute == "AttendeeIDs": # Yeni list attribute lar gelirse onlarin da kontrol edilmesi gerekir.
+            value = int(value)
+        elif attribute == "PendingRequests":
+            value = int(value)
 
         if len(advert) == 0: # No such advert exist
             result_dict["Status"] = "Fail"
@@ -640,6 +757,65 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
+
+
+# Dikkat !!!
+# Asagidaki fonksiyonlar ilanlarin "PendingRequests" attribute u olmadiginda duzgun calismayabilir !!!!!
+
+def join_advert(advertid,userid): # verilen user i verilen advert in pending requests ine eger orada ekli degilse ekleyecek
+    return update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"add")
+
+def accept_user(advertid,userid): #verilen advert icin userid yi pending requests den cikar ve attendeeids e ekle
+
+    try:
+        
+        result_dict = {}
+        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"remove")
+        if remove_query["Status"] == "Fail": # eger silemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
+            result_dict["Status"] = remove_query["Status"]
+            result_dict["Message"] = remove_query["Message"]
+            return result_dict
+
+        add_query = update_advert_list_attributes(int(advertid),"AttendeeIDs",int(userid),"add")
+        if add_query["Status"] == "Fail": # eger ekleyemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
+            result_dict["Status"] = add_query["Status"]
+            result_dict["Message"] = add_query["Message"]
+            return result_dict
+
+        user_update_query = update_user_list_attributes(int(userid),"AttendedAdverts",int(advertid),"add") # bu user in attendedadverts ina ilani ekleriz
+        if user_update_query["Status"] == "Fail":
+            result_dict["Status"] = user_update_query["Status"]
+            result_dict["Message"] = user_update_query["Message"]
+            return result_dict
+        
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"User with userid:{userid} is successfully accepted to advert with advertid:{advertid}"
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+def reject_user(advertid,userid): # verilen advert icin user id yi pending requests den sil
+    
+    try:
+
+        result_dict = {}
+        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"remove")
+        if remove_query["Status"] == "Fail": # eger silemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
+            result_dict["Status"] = remove_query["Status"]
+            result_dict["Message"] = remove_query["Message"]
+            return result_dict
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"User with userid:{userid} is successfully rejected to advert with advertid:{advertid}"
+        return result_dict
+
+    except:
+        return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
 def create_advert(ownerid,date,quota,preference,filmid,description):
     # PARAMETER TYPES
 
@@ -650,7 +826,11 @@ def create_advert(ownerid,date,quota,preference,filmid,description):
     # filmid -> int
     # description -> str
 
-    try:
+    try: 
+
+        ownerid = int(ownerid) # parametre cast gereklidir !
+        quota = int(quota)
+        filmid = int(filmid)
 
         advert_id = get_advert_id()
         increment_advert_id()
@@ -660,11 +840,12 @@ def create_advert(ownerid,date,quota,preference,filmid,description):
         formatted_description = "'" + description + "'"
         last_update_date = registration_date # Initially they are equal
         attendee_ids = []
+        pending_requests = []
         attendee_ids.append(ownerid)
-        status = "'active'"
+        status = "'Active'"
 
         TABLE_NAME = 'FakeAdvert'
-        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Description': {formatted_description}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}"
+        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Description': {formatted_description}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}, 'PendingRequests': {pending_requests}"
         insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
 
         result_dict = {} 
@@ -694,6 +875,7 @@ def delete_advert(advertid):
     
     try:
 
+        advertid = int(advertid)
         TABLE_NAME = 'FakeAdvert'
         result_dict = {} 
         advert_query = retrieve_advert(advertid)
@@ -735,6 +917,7 @@ def delete_user(userid):
 
     try:
 
+        userid = int(userid)
         TABLE_NAME = 'FakeUser'
         result_dict = {} 
         user_query = retrieve_user(userid)
@@ -920,16 +1103,16 @@ def insert_user_values():
 
     values = []
 
-    user1 = "'UserID': 1, 'CognitoAuthTokens': ['access token of bkaslan','refresh token of bkaslan'], 'Name': 'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs':[1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests':['Action', 'Thriller'], 'About':'This is an about section of bkaslan' ,'AttendedAdverts': [100,200,300]"                                                                        
-    user2 = "'UserID': 2, 'CognitoAuthTokens': ['access token of sceran','refresh token of sceran'], 'Name': 'Suleyman', 'Surname':'Ceran', 'Username':'sceran', 'AdvertIDs':[], 'Sex':'male', 'Email':'sceran@gmail.com', 'Age':21, 'Location':'Ankara-TUR', 'Bio':'This is a bio of sceran', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400,500], 'WatchedFilms':[300,500,600,100,400], 'RegistrationDate':'2022-01-01 12:35:45.000000', 'LastLogIn':'2022-05-15 23:59:58.171633',  'LogInCount':50, 'Interests':['Drama', 'Horror'], 'About':'This is an about section of sceran' ,'AttendedAdverts': [100,200,300]"                                                                        
-    user3 = "'UserID': 3, 'CognitoAuthTokens': ['access token of opolat','refresh token of opolat'], 'Name': 'Omer Faruk', 'Surname':'Polat', 'Username':'opolat', 'AdvertIDs':[6], 'Sex':'male', 'Email':'opolat@gmail.com', 'Age':22, 'Location':'Istanbul-TUR', 'Bio':'This is a bio of opolat', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[400,500,600], 'WatchedFilms':[100,200,300,400,500,600], 'RegistrationDate':'2022-11-27 01:00:17.000000', 'LastLogIn':'2022-11-30 14:20:03.171633',  'LogInCount':18, 'Interests':['Drama', 'Horror', 'Comedy'], 'About':'This is an about section of opolat' ,'AttendedAdverts': [100,200,300]"
-    user4 = "'UserID': 4, 'CognitoAuthTokens': ['access token of omujde','refresh token of omujde'], 'Name': 'Ozan', 'Surname':'Mujde', 'Username':'omujde', 'AdvertIDs':[], 'Sex':'male', 'Email':'omujde@gmail.com', 'Age':21, 'Location':'Izmir-TUR', 'Bio':'This is a bio of omujde', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100], 'WatchedFilms':[100,200,500], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':150, 'Interests':['Dark Humor', 'Horror'], 'About':'This is an about section of omujde' ,'AttendedAdverts': [100,200,300]"
-    user5 = "'UserID': 5, 'CognitoAuthTokens': ['access token of byalcin','refresh token of byalcin'], 'Name': 'Bugra', 'Surname':'Yalcin', 'Username':'byalcin', 'AdvertIDs':[], 'Sex':'male', 'Email':'byalcin@gmail.com', 'Age':20, 'Location':'Ankara-TUR', 'Bio':'This is a bio of byalcin', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200], 'WatchedFilms':[100,180,200], 'RegistrationDate':'2022-07-06 03:47:59.161723', 'LastLogIn':'2022-07-06 03:47:59.161723',  'LogInCount':1, 'Interests':['Action', 'Comics'], 'About':'This is an about section of byalcin' ,'AttendedAdverts': [100,200,300]"
-    user6 = "'UserID': 6, 'CognitoAuthTokens': ['access token of cbloom','refresh token of cbloom'], 'Name': 'Casey', 'Surname':'Bloom', 'Username':'cbloom', 'AdvertIDs':[], 'Sex':'other', 'Email':'cbloom@gmail.com', 'Age':23, 'Location':'Berlin-GER', 'Bio':'This is a bio of cbloom', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,500], 'WatchedFilms':[180,100,300,500,400], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':61, 'Interests':['Horror', 'Anime'], 'About':'This is an about section of cbloom' ,'AttendedAdverts': [100,200,300]"
-    user7 = "'UserID': 7, 'CognitoAuthTokens': ['access token of mcartney','refresh token of mcartney'], 'Name': 'Monica', 'Surname':'Cartney', 'Username':'mcartney', 'AdvertIDs':[2,5], 'Sex':'female', 'Email':'mcartney@gmail.com', 'Age':20, 'Location':'Berlin-GER', 'Bio':'This is a bio of mcartney', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[150,100,500], 'WatchedFilms':[150,100,500], 'RegistrationDate':'2021-06-06 09:22:35.101220', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':12, 'Interests':['Drama', 'Biography'], 'About':'This is an about section of mcartney' ,'AttendedAdverts': [100,200,300]"
-    user8 = "'UserID': 8, 'CognitoAuthTokens': ['access token of dson','refresh token of dson'], 'Name': 'David', 'Surname':'Son', 'Username':'dson', 'AdvertIDs':[], 'Sex':'other', 'Email':'dson@gmail.com', 'Age':28, 'Location':'London-ENG', 'Bio':'This is a bio of dson', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,200], 'WatchedFilms':[180,200], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-01-31 23:44:12.131739',  'LogInCount':31, 'Interests':['Cartoon'], 'About':'This is an about section of dson' ,'AttendedAdverts': [100,200,300]"
-    user9 = "'UserID': 9, 'CognitoAuthTokens': ['access token of edoe','refresh token of edoe'], 'Name': 'Emma', 'Surname':'Doe', 'Username':'edoe', 'AdvertIDs':[], 'Sex':'female', 'Email':'edoe@gmail.com', 'Age':19, 'Location':'London-ENG', 'Bio':'This is a bio of edoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200,400], 'WatchedFilms':[200,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':72, 'Interests':['Dc', 'Marvel'], 'About':'This is an about section of edoe' ,'AttendedAdverts': [100,200,300]"
-    user10 = "'UserID': 10, 'CognitoAuthTokens': ['access token of jdoe','refresh token of jdoe'], 'Name': 'James', 'Surname':'Doe', 'Username':'jdoe', 'AdvertIDs':[4], 'Sex':'male', 'Email':'jdoe@gmail.com', 'Age':24, 'Location':'London-ENG', 'Bio':'This is a bio of jdoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,150,200,400], 'WatchedFilms':[180,150,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':60, 'Interests':['Civil War', 'Cold War'], 'About':'This is an about section of jdoe' ,'AttendedAdverts': [100,200,300]"
+    user1 = "'UserID': 1, 'CognitoAuthTokens': ['access token of bkaslan','refresh token of bkaslan'], 'Name': 'Berk', 'Surname':'Karaaslan', 'Username':'bkaslan', 'AdvertIDs':[1,3,7,8], 'Sex':'male', 'Email':'bkaslan@gmail.com', 'Age':22, 'Location':'Ankara-TUR', 'Bio':'This is a bio of bkaslan', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400], 'WatchedFilms':[100,200,500,400], 'RegistrationDate':'2022-02-19 15:48:36.431698', 'LastLogIn':'2022-02-21 15:48:55.471318',  'LogInCount':10, 'Interests':['Action', 'Thriller'], 'About':'This is an about section of bkaslan' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "                                                                        
+    user2 = "'UserID': 2, 'CognitoAuthTokens': ['access token of sceran','refresh token of sceran'], 'Name': 'Suleyman', 'Surname':'Ceran', 'Username':'sceran', 'AdvertIDs':[], 'Sex':'male', 'Email':'sceran@gmail.com', 'Age':21, 'Location':'Ankara-TUR', 'Bio':'This is a bio of sceran', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,400,500], 'WatchedFilms':[300,500,600,100,400], 'RegistrationDate':'2022-01-01 12:35:45.000000', 'LastLogIn':'2022-05-15 23:59:58.171633',  'LogInCount':50, 'Interests':['Drama', 'Horror'], 'About':'This is an about section of sceran' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "                                                                        
+    user3 = "'UserID': 3, 'CognitoAuthTokens': ['access token of opolat','refresh token of opolat'], 'Name': 'Omer Faruk', 'Surname':'Polat', 'Username':'opolat', 'AdvertIDs':[6], 'Sex':'male', 'Email':'opolat@gmail.com', 'Age':22, 'Location':'Istanbul-TUR', 'Bio':'This is a bio of opolat', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[400,500,600], 'WatchedFilms':[100,200,300,400,500,600], 'RegistrationDate':'2022-11-27 01:00:17.000000', 'LastLogIn':'2022-11-30 14:20:03.171633',  'LogInCount':18, 'Interests':['Drama', 'Horror', 'Comedy'], 'About':'This is an about section of opolat' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user4 = "'UserID': 4, 'CognitoAuthTokens': ['access token of omujde','refresh token of omujde'], 'Name': 'Ozan', 'Surname':'Mujde', 'Username':'omujde', 'AdvertIDs':[], 'Sex':'male', 'Email':'omujde@gmail.com', 'Age':21, 'Location':'Izmir-TUR', 'Bio':'This is a bio of omujde', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100], 'WatchedFilms':[100,200,500], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':150, 'Interests':['Dark Humor', 'Horror'], 'About':'This is an about section of omujde' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user5 = "'UserID': 5, 'CognitoAuthTokens': ['access token of byalcin','refresh token of byalcin'], 'Name': 'Bugra', 'Surname':'Yalcin', 'Username':'byalcin', 'AdvertIDs':[], 'Sex':'male', 'Email':'byalcin@gmail.com', 'Age':20, 'Location':'Ankara-TUR', 'Bio':'This is a bio of byalcin', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200], 'WatchedFilms':[100,180,200], 'RegistrationDate':'2022-07-06 03:47:59.161723', 'LastLogIn':'2022-07-06 03:47:59.161723',  'LogInCount':1, 'Interests':['Action', 'Comics'], 'About':'This is an about section of byalcin' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user6 = "'UserID': 6, 'CognitoAuthTokens': ['access token of cbloom','refresh token of cbloom'], 'Name': 'Casey', 'Surname':'Bloom', 'Username':'cbloom', 'AdvertIDs':[], 'Sex':'other', 'Email':'cbloom@gmail.com', 'Age':23, 'Location':'Berlin-GER', 'Bio':'This is a bio of cbloom', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,500], 'WatchedFilms':[180,100,300,500,400], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':61, 'Interests':['Horror', 'Anime'], 'About':'This is an about section of cbloom' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user7 = "'UserID': 7, 'CognitoAuthTokens': ['access token of mcartney','refresh token of mcartney'], 'Name': 'Monica', 'Surname':'Cartney', 'Username':'mcartney', 'AdvertIDs':[2,5], 'Sex':'female', 'Email':'mcartney@gmail.com', 'Age':20, 'Location':'Berlin-GER', 'Bio':'This is a bio of mcartney', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[150,100,500], 'WatchedFilms':[150,100,500], 'RegistrationDate':'2021-06-06 09:22:35.101220', 'LastLogIn':'2022-08-13 20:12:44.131638',  'LogInCount':12, 'Interests':['Drama', 'Biography'], 'About':'This is an about section of mcartney' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user8 = "'UserID': 8, 'CognitoAuthTokens': ['access token of dson','refresh token of dson'], 'Name': 'David', 'Surname':'Son', 'Username':'dson', 'AdvertIDs':[], 'Sex':'other', 'Email':'dson@gmail.com', 'Age':28, 'Location':'London-ENG', 'Bio':'This is a bio of dson', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[180,200], 'WatchedFilms':[180,200], 'RegistrationDate':'2021-10-10 17:41:35.001200', 'LastLogIn':'2022-01-31 23:44:12.131739',  'LogInCount':31, 'Interests':['Cartoon'], 'About':'This is an about section of dson' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user9 = "'UserID': 9, 'CognitoAuthTokens': ['access token of edoe','refresh token of edoe'], 'Name': 'Emma', 'Surname':'Doe', 'Username':'edoe', 'AdvertIDs':[], 'Sex':'female', 'Email':'edoe@gmail.com', 'Age':19, 'Location':'London-ENG', 'Bio':'This is a bio of edoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[200,400], 'WatchedFilms':[200,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':72, 'Interests':['Dc', 'Marvel'], 'About':'This is an about section of edoe' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
+    user10 = "'UserID': 10, 'CognitoAuthTokens': ['access token of jdoe','refresh token of jdoe'], 'Name': 'James', 'Surname':'Doe', 'Username':'jdoe', 'AdvertIDs':[4], 'Sex':'male', 'Email':'jdoe@gmail.com', 'Age':24, 'Location':'London-ENG', 'Bio':'This is a bio of jdoe', 'ProfilePhoto': 'This is a normal string profile photo', 'LikedFilms':[100,150,200,400], 'WatchedFilms':[180,150,100,300,500,400], 'RegistrationDate':'2019-06-08 12:31:33.343536', 'LastLogIn':'2021-11-30 18:03:21.180321',  'LogInCount':60, 'Interests':['Civil War', 'Cold War'], 'About':'This is an about section of jdoe' ,'AttendedAdverts': [100,200,300], 'LastUpdateDate': '2019-06-08 12:31:33.343536' "
 
     values.append(user1)
     values.append(user2)
@@ -951,14 +1134,14 @@ def insert_user_values():
 def insert_advert_values():
 
     values = []                                                                    
-    advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description' "                                                                        
-    advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150, 'Description': 'this is description' "
-    advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200, 'Description': 'this is description' "
-    advert4 = "'AdvertID': 4, 'OwnerID': 10, 'Date': '2022-02-28 12:30:00.000000', 'RegistrationDate':'2022-02-15 10:09:16.001234', 'LastUpdateDate':'2022-02-15 11:37:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [10,5,6,7,8], 'Status': 'Active', 'FilmID': 180, 'Description': 'this is description' "
-    advert5 = "'AdvertID': 5, 'OwnerID': 7, 'Date': '2022-02-25 11:00:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-15 20:55:18.123456', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [7,2,9,16], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description' "
-    advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300, 'Description': 'this is description' "
-    advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500, 'Description': 'this is description' "
-    advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400, 'Description': 'this is description' "
+    advert1 = "'AdvertID': 1, 'OwnerID': 1, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-14 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,3,4,5], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description', 'PendingRequests': [] "                                                                        
+    advert2 = "'AdvertID': 2, 'OwnerID': 7, 'Date': '2022-02-20 20:30:00.000000', 'RegistrationDate':'2022-02-16 19:47:16.001234', 'LastUpdateDate':'2022-02-16 19:47:16.001234', 'Quota': 2, 'AttendeePreference':'male', 'AttendeeIDs': [7,10], 'Status': 'Active', 'FilmID': 150, 'Description': 'this is description', 'PendingRequests': [] "
+    advert3 = "'AdvertID': 3, 'OwnerID': 1, 'Date': '2022-02-25 21:00:00.000000', 'RegistrationDate':'2022-02-12 20:33:16.001234', 'LastUpdateDate':'2022-02-12 20:47:16.172144', 'Quota': 3, 'AttendeePreference':'female', 'AttendeeIDs': [1,7,9], 'Status': 'Active', 'FilmID': 200, 'Description': 'this is description', 'PendingRequests': [] "
+    advert4 = "'AdvertID': 4, 'OwnerID': 10, 'Date': '2022-02-28 12:30:00.000000', 'RegistrationDate':'2022-02-15 10:09:16.001234', 'LastUpdateDate':'2022-02-15 11:37:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [10,5,6,7,8], 'Status': 'Active', 'FilmID': 180, 'Description': 'this is description', 'PendingRequests': [] "
+    advert5 = "'AdvertID': 5, 'OwnerID': 7, 'Date': '2022-02-25 11:00:00.000000', 'RegistrationDate':'2022-02-14 19:47:16.001234', 'LastUpdateDate':'2022-02-15 20:55:18.123456', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [7,2,9,16], 'Status': 'Active', 'FilmID': 100, 'Description': 'this is description', 'PendingRequests': [] "
+    advert6 = "'AdvertID': 6, 'OwnerID': 3, 'Date': '2021-05-25 23:00:00.000000', 'RegistrationDate':'2021-05-10 19:47:16.001234', 'LastUpdateDate':'2021-05-10 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [3,2,9,10,6], 'Status': 'Previous', 'FilmID': 300, 'Description': 'this is description', 'PendingRequests': [] "
+    advert7 = "'AdvertID': 7, 'OwnerID': 1, 'Date': '2021-01-13 15:30:00.000000', 'RegistrationDate':'2022-01-06 19:47:16.001234', 'LastUpdateDate':'2022-01-06 19:47:16.001234', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 500, 'Description': 'this is description', 'PendingRequests': [] "
+    advert8 = "'AdvertID': 8, 'OwnerID': 1, 'Date': '2021-02-14 20:00:00.000000', 'RegistrationDate':'2021-02-03 12:33:21.124346', 'LastUpdateDate':'2021-02-03 12:33:21.124346', 'Quota': 5, 'AttendeePreference':'all', 'AttendeeIDs': [1,2,9,10,6], 'Status': 'Previous', 'FilmID': 400, 'Description': 'this is description', 'PendingRequests': [] "
     values.append(advert1)
     values.append(advert2)
     values.append(advert3)
