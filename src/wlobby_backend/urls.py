@@ -30,7 +30,7 @@ from django.views.generic.base import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view), # Default view for our homepage
-
+    path('login/', login),
     path('get/user/',get_user_view), # user i don
     path('get/user/adverts/',get_user_adverts_view), # bu user in butun advertlarini don
     path('get/user/with/mail/',get_user_with_mail_view), # mail adresi ile sorgulanan useri donecek
@@ -54,6 +54,7 @@ urlpatterns = [
     path('join/advert/', join_advert_view), # bu 3 request direk url den parametreleri alacak.
     path('accept/user/', accept_user_view),
     path('reject/user/', reject_user_view),
+
 
 
    
