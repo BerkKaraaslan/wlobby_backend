@@ -19,6 +19,7 @@ region = 'us-east-1'
 userpool_id = 'us-east-1_2kkPUknf2'
 app_client_id = '6m7fmpsps3p1s3cbp3o30hkr70'
 keys_url = 'https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json'.format(region, userpool_id)
+
 # instead of re-downloading the public keys every time
 # we download them only on cold start
 # https://aws.amazon.com/blogs/compute/container-reuse-in-lambda/
@@ -28,6 +29,7 @@ keys = json.loads(response.decode('utf-8'))['keys']
 
 
 def lambda_handler(event, context):
+    print(keys_url)
     token = event['token']
     # get the kid from the headers prior to verification
     headers = jwt.get_unverified_headers(token)

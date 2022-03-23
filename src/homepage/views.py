@@ -39,26 +39,30 @@ def getTokens(code):
     CLIENT_ID = config('CLIENT_ID')
     CLIENT_SECRET = config('CLIENT_SECRET')
 
-    encodeData = base64.b64encode(bytes(f"{CLIENT_ID}:{CLIENT_SECRET}", "ISO-8859-1")).decode("ascii")
 
-    headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': f'Basic{encodeData}'
+
+    token_url = TOKEN_END_POINT
+    message = bytes(f"{CLIENT_ID}:{CLIENT_SECRET}", 'utf-8')
+    secret_hash = base64.b64encode(message).decode()
+    payload = {
+        "grant_type": 'authorization_code',
+        "client_id": CLIENT_ID,
+        "code": code,
+        "redirect_uri": REDIRECT_URI
     }
+    headers = {"Content-Type": "application/x-www-form-urlencoded",
+               "Authorization": f"Basic {secret_hash}"}
 
-    body = {
-        'grant_type': 'authorization_code',
-        'client_id': CLIENT_ID,
-        'code': code,
-        'redirect_uri': REDIRECT_URI
-    }
+    response = requests.post(token_url, params=payload, headers=headers)
 
-    response = requests.post(TOKEN_END_POINT, data=body, headers=headers)
-    print(response)
+    
     # response will return id token, access token and refresh token
     id_token = response.json()['id_token']
+
+
     user_Data = decode_jwt.lamda_handler(id_token, None)
 
+    print(user_Data)
     if not user_Data:
         return False
 
