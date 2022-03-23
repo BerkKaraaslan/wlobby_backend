@@ -30,49 +30,36 @@ from django.views.generic.base import RedirectView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view), # Default view for our homepage
+
     path('login/', login),
-    path('get/user/',get_user_view), # user i don
-    path('get/user/adverts/',get_user_adverts_view), # bu user in butun advertlarini don
-    path('get/user/with/mail/',get_user_with_mail_view), # mail adresi ile sorgulanan useri donecek
-    path('get/users/',get_users_view), # butun userlari don
-    path('get/users/with/name/surname/',get_users_with_name_and_surname_view), # name ve surname ile bulunan userlari don
-    path('get/advert/',get_advert_view), # adverti don
-    path('get/adverts/',get_adverts_view),# butun advertlari don
-    path('get/adverts/with/filmid/',get_adverts_with_filmid_view),
+
+    path('get/user/',get_user_view), # user i don   GET
+    path('get/user/adverts/',get_user_adverts_view), # bu user in butun advertlarini don    GET
+    path('get/user/with/mail/',get_user_with_mail_view), # mail adresi ile sorgulanan useri donecek GET
+    path('get/users/',get_users_view), # butun userlari don     GET
+    path('get/users/with/name/surname/',get_users_with_name_and_surname_view), # name ve surname ile bulunan userlari don   GET
+    path('get/advert/',get_advert_view), # adverti don  GET
+    path('get/adverts/',get_adverts_view),# butun advertlari don    GET
+    path('get/adverts/with/filmid/',get_adverts_with_filmid_view),      # GET
     
-    path('update/user/',update_user_view), # user i update et
-    path('update/advert/',update_advert_view), # advert i update et
-    path('update/user/list/',update_user_list_attributes_view), # userin list attr.unu update et
-    path('update/advert/list/',update_advert_list_attributes_view), # advertin list attr.unu update et
+    path('update/user/',update_user_view), # user i update et       PUT
+    path('update/advert/',update_advert_view), # advert i update et      PUT
+    path('update/user/list/',update_user_list_attributes_view), # userin list attr.unu update et           PUT
+    path('update/advert/list/',update_advert_list_attributes_view), # advertin list attr.unu update et     PUT
 
-    path('delete/user/',delete_user_view), # useri sil
-    path('delete/advert/',delete_advert_view), # adverti sil
+    path('delete/user/',delete_user_view), # useri sil      DELETE
+    path('delete/advert/',delete_advert_view), # adverti sil        DELETE
 
-    path('create/user/', create_user_view), # useri yarat
-    path('create/advert/', create_advert_view), # adverti yarat
+    path('create/user/', create_user_view), # useri yarat       POST
+    path('create/advert/', create_advert_view), # adverti yarat     POST
 
-    path('join/advert/', join_advert_view), # bu 3 request direk url den parametreleri alacak.
-    path('accept/user/', accept_user_view),
-    path('reject/user/', reject_user_view),
-
-
-
-   
-
-    # request lerde body byte string oluyor yanilmiyorsam.
-    # byte string -> string -> json (veya dict) e cevrilip direk attributelar alinacak
+    path('join/advert/', join_advert_view), # bu 3 request direk url den parametreleri alacak.      PUT
+    path('accept/user/', accept_user_view), # PUT
+    path('reject/user/', reject_user_view), # PUT
 
 
-    # update ve createlerde body den mesaj alinacak
-
-   
-
-
-
-    # URL lerde PUT ve POST requesti geldiğinde parametreleri URL den değil requestin body sinden okuyacak hale getir.
-    # ayrıca omer ile wp ye gore request tiplerini de duzelt hepsi GET olmayacak tabi ki
-    # body den json falan alip onu dicitonary ye cevirme yontemlerine bak
-    # faydali bir link https://stackoverflow.com/questions/1208067/wheres-my-json-data-in-my-incoming-django-request
+    # Bu requestlerin PUT ve POST olanlarinda parametreler http mesajının body kismindan alinacak
+    # ANCAK son 3 URL haric cunku onlarda update ama onlarin URL i cok kisa!!!
 
 
     path('redirection/', redirection_view),
@@ -94,9 +81,5 @@ if settings.DEBUG:
     
 
 
-
-
-
-# sonda slash / olmamali
 # ayrica redirect loop a takiliyor !!! 
 # onu cozmenin yolunu bul !!! sadece URL in son kismini degil URL in tamammini redirection a yonlendirsin

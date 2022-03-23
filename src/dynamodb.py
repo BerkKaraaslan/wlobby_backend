@@ -41,14 +41,6 @@ def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevi
     return formatted_item
 
 
-def validate_tokens(userid,tokens): 
-    # verilen user in tokenlari gercekten de tablodaki tokenlar ile ayni ise success seklinde bir dict donecek
-    # success dict gelince userin istedigi islem yapilacak
-    # aksi halde fail dict donecek
-    # fail seklinde dict gelince userin islemi yapilmadan fail dict i http response olarak donulecek
-    pass
-
-
 
 # SADECE email zorunlu arguman diger butun argumanlar opsiyonel
 def create_user(email,authtokens=None,name=None,surname=None,username=None,sex=None,age=None,location=None,bio=None,profilephoto=None,likedfilms=None,interests=None,about=None):
@@ -181,6 +173,35 @@ def retrieve_user(userid):
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+def validate_tokens(userid,tokens): 
+    # PARAMETER TYPES
+
+    # userid -> int
+    # tokens -> str list
+
+
+    # userid si verilen useri getirir ve userin tokenlarini parametre olarak verilen tokenlarla karsilastirir
+    # bu fonksiyonun dogru calismasi icin tokenlarin sirasinin tablodaki ile ayni olması gerekir. 
+    # eger bu ozellik saglanamayacaksa bu implementation degistirilmelidir.
+
+    # eger tokenlar tablodaki ile ayni ise true aksi halde false doner
+
+    user_query = retrieve_user(userid)
+
+    if user_query["Status"] == "Fail": # eger fail etti ise false don
+        return False
+
+    user = user_query["Item"]
+    user_auth_tokens = user["CognitoAuthTokens"]
+
+    if user_auth_tokens == tokens:
+        return True
+    else:
+        return False
+    
+
 
 
 def retrieve_advert(advertid):

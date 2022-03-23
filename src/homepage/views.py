@@ -3,12 +3,6 @@ from django.http import HttpResponse
 from dynamodb import *
 from django.http import request
 import json
-# Create your views here.
-
-
-from django.shortcuts import render
-
-# Create your views here.
 from decouple import config
 import base64
 import requests
@@ -96,7 +90,6 @@ def get_user_view(request):
 
     # userid -> int
     # REQUEST TYPE -> GET
-    print(request.body)
     try:
 
         user_id = request.GET.get('userid', '')
@@ -237,26 +230,25 @@ def update_user_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        # user_id = request.GET.get('userid','')
-        # if user_id == '': # parametre verilmemis
-        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify userid"}))
-        # attribute = request.GET.get('attribute','')
-        # if attribute == '': # parametre verilmemis
-        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
-        # new_value = request.GET.get('new_value','')
-        # if new_value == '': # parametre verilmemis
-        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
-        # retrieve_dict = update_user(user_id,attribute,new_value)
-        # return HttpResponse(json.dumps(retrieve_dict))
+        request_parameters = json.loads(request.body.decode("utf-8"))
 
-        parameters = json.loads(request.body.decode(
-            "utf-8"))  # bu sekilde gelen requestin body sinde json formatında bulunan seyi dict olarak aldik
+        if "userid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify userid"}))
 
-        # parameters in type i dict olarak elimizde !!!
-        # direk parameters["userid"] seklinde ulasilabilir
+        user_id = request_parameters["userid"]
 
-        return HttpResponse(json.dumps({"Status": "Success", "Message": "This is the dummy answer"}))
+        if "attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
 
+        attribute = request_parameters["attribute"]
+
+        if "new_value" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+
+        new_value = request_parameters["new_value"]
+
+        retrieve_dict = update_user(user_id,attribute,new_value)
+        return HttpResponse(json.dumps(retrieve_dict))
 
     except:
         return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
@@ -271,16 +263,24 @@ def update_advert_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        advert_id = request.GET.get('advertid', '')
-        if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify advertid"}))
-        attribute = request.GET.get('attribute', '')
-        if attribute == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify attribute"}))
-        new_value = request.GET.get('new_value', '')
-        if new_value == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify new_value"}))
-        retrieve_dict = update_advert(advert_id, attribute, new_value)
+        request_parameters = json.loads(request.body.decode("utf-8"))
+
+        if "advertid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify advertid"}))
+
+        advert_id = request_parameters["advertid"]
+
+        if "attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+
+        attribute = request_parameters["attribute"]
+
+        if "new_value" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+
+        new_value = request_parameters["new_value"]
+
+        retrieve_dict = update_advert(advert_id,attribute,new_value)
         return HttpResponse(json.dumps(retrieve_dict))
 
     except:
@@ -296,21 +296,31 @@ def update_user_list_attributes_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        user_id = request.GET.get('userid', '')
-        if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
-        attribute = request.GET.get('attribute', '')
-        if attribute == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify attribute"}))
-        new_value = request.GET.get('new_value', '')
-        if new_value == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify new_value"}))
-        op_type = request.GET.get('op_type', '')
-        if op_type == '':  # parametre verilmemis
-            return HttpResponse(
-                json.dumps({"Status": "Fail", "Message": "You must specify op_type valid op_types are add and remove"}))
-        retrieve_dict = update_user_list_attributes(user_id, attribute, new_value, op_type)
+        request_parameters = json.loads(request.body.decode("utf-8"))
+
+        if "userid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify userid"}))
+
+        user_id = request_parameters["userid"]
+
+        if "attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+
+        attribute = request_parameters["attribute"]
+
+        if "new_value" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+
+        new_value = request_parameters["new_value"]
+
+        if "op_type" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify op_type valid op_types are add and remove"}))
+
+        op_type = request_parameters["op_type"]
+
+        retrieve_dict = update_user_list_attributes(user_id,attribute,new_value,op_type)
         return HttpResponse(json.dumps(retrieve_dict))
+
 
     except:
         return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
@@ -325,21 +335,31 @@ def update_advert_list_attributes_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        advert_id = request.GET.get('advertid', '')
-        if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify advertid"}))
-        attribute = request.GET.get('attribute', '')
-        if attribute == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify attribute"}))
-        new_value = request.GET.get('new_value', '')
-        if new_value == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify new_value"}))
-        op_type = request.GET.get('op_type', '')
-        if op_type == '':  # parametre verilmemis
-            return HttpResponse(
-                json.dumps({"Status": "Fail", "Message": "You must specify op_type valid op_types are add and remove"}))
-        retrieve_dict = update_advert_list_attributes(advert_id, attribute, new_value, op_type)
+        request_parameters = json.loads(request.body.decode("utf-8"))
+
+        if "advertid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify advertid"}))
+
+        advert_id = request_parameters["advertid"]
+
+        if "attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+
+        attribute = request_parameters["attribute"]
+
+        if "new_value" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+
+        new_value = request_parameters["new_value"]
+
+        if "op_type" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify op_type valid op_types are add and remove"}))
+
+        op_type = request_parameters["op_type"]
+
+        retrieve_dict = update_advert_list_attributes(advert_id,attribute,new_value,op_type)
         return HttpResponse(json.dumps(retrieve_dict))
+
 
     except:
         return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
@@ -400,72 +420,79 @@ def create_user_view(request):
     # Eger Cognito tokenlari kendi iclerinde , karakteri iceriyorsa bu kodun guncellenmesi gerekir bu hali calismaz !!!
     # Cast islemini fonksiyonu cagirirken yap !!!!
 
-    # Burasi update edilecek !!!!!!
-
     try:
 
-        auth_tokens = request.GET.get('auth_tokens', '')
-        if auth_tokens == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify auth_tokens"}))
-        auth_tokens = auth_tokens.split(",")
-        formatted_auth_tokens = []  # dogru formatlanmis tokenlar bu list de yer alacak
-        for i in range(len(auth_tokens)):
-            formatted_auth_tokens.append(auth_tokens[i].replace("\"", ""))
-        name = request.GET.get('name', '')
-        if name == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify name"}))
+        request_parameters = json.loads(request.body.decode("utf-8"))
 
-        # artik zorunlu olmayan attributelarda bu hatayi vermeyecek
-        # ornek
-        # if name == '': # parametre verilmemis
-        #    name = None # bu sayede fonksiyona verince default argumanla ayni oldugu icin user a name koymayacak
-        # else durumunda bir sey yapilmayacak
-        # cunku zaten argumanin bir degeri var !!!
+        if "email" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify email"}))
 
-        surname = request.GET.get('surname', '')
-        if surname == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify surname"}))
-        username = request.GET.get('username', '')
-        if username == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify username"}))
-        sex = request.GET.get('sex', '')
-        if sex == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify sex"}))
-        email = request.GET.get('email', '')
-        if email == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify email"}))
-        age = request.GET.get('age', '')
-        if age == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify age"}))
-        location = request.GET.get('location', '')
-        if location == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify location"}))
-        bio = request.GET.get('bio', '')
-        if bio == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify bio"}))
-        profile_photo = request.GET.get('profile_photo', '')
-        if profile_photo == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify profile_photo"}))
-        liked_films = request.GET.get('liked_films', '')
-        if liked_films == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify liked_films"}))
-        liked_films = liked_films.split(",")
-        formatted_liked_films = []  # dogru formatlanmis liked films ler bu list de yer alacak
-        for i in range(len(liked_films)):
-            formatted_liked_films.append(int(liked_films[i]))
-        interests = request.GET.get('interests', '')
-        if interests == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify interests"}))
-        interests = interests.split(",")
-        formatted_interests = []  # dogru formatlanmis interests ler bu list de yer alacak
-        for i in range(len(interests)):
-            formatted_interests.append(interests[i].replace("\"", ""))
-        about = request.GET.get('about', '')
-        if about == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify about"}))
-        retrieve_dict = create_user(formatted_auth_tokens, name, surname, username, sex, email, age, location, bio,
-                                    profile_photo, formatted_liked_films, formatted_interests, about)
+        email = request_parameters["email"]
+
+        if "authtokens" not in request_parameters.keys():
+            authtokens = None
+        else:
+            authtokens = request_parameters["authtokens"]
+
+        if "name" not in request_parameters.keys():
+            name = None
+        else:
+            name = request_parameters["name"]
+       
+        if "surname" not in request_parameters.keys():
+            surname = None
+        else:
+            surname = request_parameters["surname"]
+
+        if "username" not in request_parameters.keys():
+            username = None
+        else:
+            username = request_parameters["username"]
+        
+        if "sex" not in request_parameters.keys():
+            sex = None
+        else:
+            sex = request_parameters["sex"]
+
+        if "age" not in request_parameters.keys():
+            age = None
+        else:
+            age = request_parameters["age"]
+
+        if "location" not in request_parameters.keys():
+            location = None
+        else:
+            location = request_parameters["location"]
+
+        if "bio" not in request_parameters.keys():
+            bio = None
+        else:
+            bio = request_parameters["bio"]
+
+        if "profilephoto" not in request_parameters.keys():
+            profilephoto = None
+        else:
+            profilephoto = request_parameters["profilephoto"]
+
+        if "likedfilms" not in request_parameters.keys():
+            likedfilms = None
+        else:
+            likedfilms = request_parameters["likedfilms"]
+
+        if "interests" not in request_parameters.keys():
+            interests = None
+        else:
+            interests = request_parameters["interests"]
+
+        if "about" not in request_parameters.keys():
+            about = None
+        else:
+            about = request_parameters["about"]
+
+
+        retrieve_dict = create_user(email,authtokens=authtokens,name=name,surname=surname,username=username,sex=sex,age=age,location=location,bio=bio,profilephoto=profilephoto,likedfilms=likedfilms,interests=interests,about=about)
         return HttpResponse(json.dumps(retrieve_dict))
+
 
     except:
         return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
@@ -483,26 +510,42 @@ def create_advert_view(request):
 
     try:
 
-        owner_id = request.GET.get('ownerid', '')
-        if owner_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the ownerid"}))
-        date = request.GET.get('date', '')
-        if date == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify date"}))
-        quota = request.GET.get('quota', '')
-        if quota == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify quota"}))
-        preference = request.GET.get('preference', '')
-        if preference == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify preference"}))
-        film_id = request.GET.get('filmid', '')
-        if film_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify filmid"}))
-        description = request.GET.get('description', '')
-        if description == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify description"}))
+        request_parameters = json.loads(request.body.decode("utf-8"))
+
+        if "ownerid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify ownerid"}))
+
+        owner_id = request_parameters["ownerid"]
+
+        if "date" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify date"}))
+
+        date = request_parameters["date"]
+
+        if "quota" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify quota"}))
+
+        quota = request_parameters["quota"]
+
+        if "preference" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify preference"}))
+
+        preference = request_parameters["preference"]
+
+        if "filmid" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify filmid"}))
+
+        film_id = request_parameters["filmid"]
+
+        if "description" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify description"}))
+
+        description = request_parameters["description"]
+
+
         retrieve_dict = create_advert(owner_id, date, quota, preference, film_id, description)
         return HttpResponse(json.dumps(retrieve_dict))
+
 
     except:
         return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
