@@ -13,17 +13,17 @@ def login(request):
     try:
         code = request.GET.get('code')
         userdata = getTokens(code)
-        print('fff')
-        response = HttpResponse(json.dumps({"Status": "Success", "Message": "User infos pass", "User_data": userdata}))
+
+        response = HttpResponse(json.dumps({"Status": "Success", "Message": "User data passed", "User_data": userdata}))
         response.set_cookie('sessiontoken', userdata['id_token'], max_age=24 * 60 * 60, httponly=True)
         return response
     except:
+        print(bummmm)
         token = getSession(request)
 
         if token is not None:
-            userdata = decode_jwt.lamda_handler(token, None)
-            response = HttpResponse(
-                json.dumps({"Status": "Success", "Message": "User infos pass", "User_data": userdata}))
+            userdata =lambda_handler(token, None)
+            response = HttpResponse(json.dumps({"Status": "Success", "Message": "User data passed", "User_data": userdata}))
         return response
 
 
@@ -61,10 +61,10 @@ def getTokens(code):
         return False
 
     user = {
-        'id_token': id_token,
-        'access_token' :access_token,
         'name': user_Data['name'],
-        'email': user_Data['email']
+        'email': user_Data['email',
+        'id_token': id_token,
+        'access_token' :access_token]
     }
 
     return user
