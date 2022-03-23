@@ -12,7 +12,7 @@ from django.shortcuts import render
 from decouple import config
 import base64
 import requests
-from homepage import decode_jwt
+from .decode_jwt import *
 
 
 def login(request):
@@ -39,8 +39,6 @@ def getTokens(code):
     CLIENT_ID = config('CLIENT_ID')
     CLIENT_SECRET = config('CLIENT_SECRET')
 
-
-
     token_url = TOKEN_END_POINT
     message = bytes(f"{CLIENT_ID}:{CLIENT_SECRET}", 'utf-8')
     secret_hash = base64.b64encode(message).decode()
@@ -55,19 +53,22 @@ def getTokens(code):
 
     response = requests.post(token_url, params=payload, headers=headers)
 
-    
     # response will return id token, access token and refresh token
     id_token = response.json()['id_token']
+    access_token = response.json()['access_token']
+    refresh_token = response.json()['refresh_token']
+    print(access_token)
+    #user_Data = decode_jwt.lamda_handler({'token': id_token}, None)
 
+    event={'token' : id_token}
+    user_Data=lambda_handler(event,None)
 
-    user_Data = decode_jwt.lamda_handler(id_token, None)
-
-    print(user_Data)
     if not user_Data:
         return False
 
     user = {
         'id_token': id_token,
+        'access_token' :access_token,
         'name': user_Data['name'],
         'email': user_Data['email']
     }

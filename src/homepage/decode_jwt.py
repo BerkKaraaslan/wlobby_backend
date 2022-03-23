@@ -31,6 +31,7 @@ keys = json.loads(response.decode('utf-8'))['keys']
 def lambda_handler(event, context):
     print(keys_url)
     token = event['token']
+    print(token)
     # get the kid from the headers prior to verification
     headers = jwt.get_unverified_headers(token)
     kid = headers['kid']
@@ -75,5 +76,5 @@ def lambda_handler(event, context):
 # AWS Lambda and any other local environments
 if __name__ == '__main__':
     # for testing locally you can enter the JWT ID Token here
-    event = {'token': ''}
+    event = {'token': "eyJraWQiOiJ6QUpFRTdkQVdQb3kzXC9VWlBqdUc4M0RBcmV3Yk5FTnF6bkpheWt4SzA1MD0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoiSDZ1ZW9PZVFoRWcxaE1NQ240cWtLUSIsInN1YiI6IjhiNWVhNGZjLTZlOWQtNDc1Mi1iODk1LWY2MDIzNGQ4ZjJiNyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV8ya2tQVWtuZjIiLCJjb2duaXRvOnVzZXJuYW1lIjoiOGI1ZWE0ZmMtNmU5ZC00NzUyLWI4OTUtZjYwMjM0ZDhmMmI3Iiwib3JpZ2luX2p0aSI6IjBhOGQ3MmQ3LTU2MGMtNDExNC1iZjgzLWRjODU4MWQwNjhmZSIsImF1ZCI6IjZtN2ZtcHNwczNwMXMzY2JwM28zMGhrcjcwIiwidG9rZW5fdXNlIjoiaWQiLCJhdXRoX3RpbWUiOjE2NDgwNzY1NjUsIm5hbWUiOiJidWdyYSIsImV4cCI6MTY0ODE2Mjk2NSwiaWF0IjoxNjQ4MDc2NTY1LCJqdGkiOiI5MTJiNjg2MC0wOWE2LTQxMDMtYmVkNi0wNTI2OGM1NmUwNTgiLCJlbWFpbCI6ImFyZ3Vibmlrc2F0QGdtYWlsLmNvbSJ9.Xnhu3nhazecLOeWclA5GX37j6KnR9Cnx7S5UTwL7V9W2DsP43cH45BzoO91eq9OH6M_xkLTO1TkaL5jwXH73wNxB0l26IdKrMAtdzYhc2ayFj0aaUn8gv-78Rc2C7QIobu0Wx3u_en5ewadq7wqIVvz7amZ1rG4gj0h_D2JE9vwFp7Q7oTIrQiafP9eRTIq_Fy0cgWmU-kFMuCinL61JUoMFnfZu3graifO31_AQg33aCXMakBA7auDXVRB-18eaNCKdASP6wCQeoSG4dwMSkPKXwPR7xgUbwpcmG08YRVZ6x4NwkW_DrDRn4fhev7eOTLgwEHM_RZ6DJ5wYPxarzQ"}
     lambda_handler(event, None)
