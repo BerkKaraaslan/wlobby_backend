@@ -89,9 +89,9 @@ def get_user_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        user_id = request.GET.get('userid', '')
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
         retrieve_dict = retrieve_user(user_id)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -106,9 +106,9 @@ def get_user_adverts_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        user_id = request.GET.get('userid', '')
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
         retrieve_dict = retrieve_users_all_adverts(user_id)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -123,9 +123,9 @@ def get_user_with_mail_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        email = request.GET.get('email', '')
+        email = request.GET.get('Email', '')
         if email == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify email"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify Email"}))
         retrieve_dict = retrieve_user_with_email(email)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -156,10 +156,10 @@ def get_users_with_name_and_surname_view(request):
     # kontrol fonksiyonda yapiliyor burada eger parametre yoksa None gonderilecek
     try:
 
-        name = request.GET.get('name', '')
+        name = request.GET.get('Name', '')
         if name == '':  # parametre verilmemis
             name = None
-        surname = request.GET.get('surname', '')
+        surname = request.GET.get('Surname', '')
         if surname == '':  # parametre verilmemis
             surname = None
 
@@ -177,9 +177,9 @@ def get_advert_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        advert_id = request.GET.get('advertid', '')
+        advert_id = request.GET.get('AdvertID', '')
         if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify advertid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify AdvertID"}))
         retrieve_dict = retrieve_advert(advert_id)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -208,9 +208,9 @@ def get_adverts_with_filmid_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        filmid = request.GET.get('filmid', '')
+        filmid = request.GET.get('FilmID', '')
         if filmid == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify filmid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify FilmID"}))
         retrieve_dict = retrieve_all_adverts_with_filmid(filmid)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -229,20 +229,20 @@ def update_user_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "userid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify userid"}))
+        if "UserID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify UserID"}))
 
-        user_id = request_parameters["userid"]
+        user_id = request_parameters["UserID"]
 
-        if "attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+        if "Attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["attribute"]
+        attribute = request_parameters["Attribute"]
 
-        if "new_value" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+        if "NewValue" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["new_value"]
+        new_value = request_parameters["NewValue"]
 
         retrieve_dict = update_user(user_id,attribute,new_value)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -262,20 +262,20 @@ def update_advert_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "advertid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify advertid"}))
+        if "AdvertID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify AdvertID"}))
 
-        advert_id = request_parameters["advertid"]
+        advert_id = request_parameters["AdvertID"]
 
-        if "attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+        if "Attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["attribute"]
+        attribute = request_parameters["Attribute"]
 
-        if "new_value" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+        if "NewValue" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["new_value"]
+        new_value = request_parameters["NewValue"]
 
         retrieve_dict = update_advert(advert_id,attribute,new_value)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -295,25 +295,25 @@ def update_user_list_attributes_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "userid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify userid"}))
+        if "UserID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify UserID"}))
 
-        user_id = request_parameters["userid"]
+        user_id = request_parameters["UserID"]
 
-        if "attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+        if "Attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["attribute"]
+        attribute = request_parameters["Attribute"]
 
-        if "new_value" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+        if "NewValue" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["new_value"]
+        new_value = request_parameters["NewValue"]
 
-        if "op_type" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify op_type valid op_types are add and remove"}))
+        if "OpType" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify OpType valid OpTypes are add and remove"}))
 
-        op_type = request_parameters["op_type"]
+        op_type = request_parameters["OpType"]
 
         retrieve_dict = update_user_list_attributes(user_id,attribute,new_value,op_type)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -334,25 +334,25 @@ def update_advert_list_attributes_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "advertid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify advertid"}))
+        if "AdvertID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify AdvertID"}))
 
-        advert_id = request_parameters["advertid"]
+        advert_id = request_parameters["AdvertID"]
 
-        if "attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify attribute"}))
+        if "Attribute" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["attribute"]
+        attribute = request_parameters["Attribute"]
 
-        if "new_value" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify new_value"}))
+        if "NewValue" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["new_value"]
+        new_value = request_parameters["NewValue"]
 
-        if "op_type" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify op_type valid op_types are add and remove"}))
+        if "OpType" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify OpType valid OpTypes are add and remove"}))
 
-        op_type = request_parameters["op_type"]
+        op_type = request_parameters["OpType"]
 
         retrieve_dict = update_advert_list_attributes(advert_id,attribute,new_value,op_type)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -369,9 +369,9 @@ def delete_user_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        user_id = request.GET.get('userid', '')
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
         retrieve_dict = delete_user(user_id)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -386,9 +386,9 @@ def delete_advert_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        advert_id = request.GET.get('advertid', '')
+        advert_id = request.GET.get('AdvertID', '')
         if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify advertid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify AdvertID"}))
         retrieve_dict = delete_advert(advert_id)
         return HttpResponse(json.dumps(retrieve_dict))
 
@@ -421,70 +421,70 @@ def create_user_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "email" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify email"}))
+        if "Email" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Email"}))
 
-        email = request_parameters["email"]
+        email = request_parameters["Email"]
 
-        if "authtokens" not in request_parameters.keys():
+        if "CognitoAuthTokens" not in request_parameters.keys():
             authtokens = None
         else:
-            authtokens = request_parameters["authtokens"]
+            authtokens = request_parameters["CognitoAuthTokens"]
 
-        if "name" not in request_parameters.keys():
+        if "Name" not in request_parameters.keys():
             name = None
         else:
-            name = request_parameters["name"]
+            name = request_parameters["Name"]
        
-        if "surname" not in request_parameters.keys():
+        if "Surname" not in request_parameters.keys():
             surname = None
         else:
-            surname = request_parameters["surname"]
+            surname = request_parameters["Surname"]
 
-        if "username" not in request_parameters.keys():
+        if "Username" not in request_parameters.keys():
             username = None
         else:
-            username = request_parameters["username"]
+            username = request_parameters["Username"]
         
-        if "sex" not in request_parameters.keys():
+        if "Sex" not in request_parameters.keys():
             sex = None
         else:
-            sex = request_parameters["sex"]
+            sex = request_parameters["Sex"]
 
-        if "age" not in request_parameters.keys():
+        if "Age" not in request_parameters.keys():
             age = None
         else:
-            age = request_parameters["age"]
+            age = request_parameters["Age"]
 
-        if "location" not in request_parameters.keys():
+        if "Location" not in request_parameters.keys():
             location = None
         else:
-            location = request_parameters["location"]
+            location = request_parameters["Location"]
 
-        if "bio" not in request_parameters.keys():
+        if "Bio" not in request_parameters.keys():
             bio = None
         else:
-            bio = request_parameters["bio"]
+            bio = request_parameters["Bio"]
 
-        if "profilephoto" not in request_parameters.keys():
+        if "ProfilePhoto" not in request_parameters.keys():
             profilephoto = None
         else:
-            profilephoto = request_parameters["profilephoto"]
+            profilephoto = request_parameters["ProfilePhoto"]
 
-        if "likedfilms" not in request_parameters.keys():
+        if "LikedFilms" not in request_parameters.keys():
             likedfilms = None
         else:
-            likedfilms = request_parameters["likedfilms"]
+            likedfilms = request_parameters["LikedFilms"]
 
-        if "interests" not in request_parameters.keys():
+        if "Interests" not in request_parameters.keys():
             interests = None
         else:
-            interests = request_parameters["interests"]
+            interests = request_parameters["Interests"]
 
-        if "about" not in request_parameters.keys():
+        if "About" not in request_parameters.keys():
             about = None
         else:
-            about = request_parameters["about"]
+            about = request_parameters["About"]
 
 
         retrieve_dict = create_user(email,authtokens=authtokens,name=name,surname=surname,username=username,sex=sex,age=age,location=location,bio=bio,profilephoto=profilephoto,likedfilms=likedfilms,interests=interests,about=about)
@@ -509,35 +509,35 @@ def create_advert_view(request):
 
         request_parameters = json.loads(request.body.decode("utf-8"))
 
-        if "ownerid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify ownerid"}))
+        if "OwnerID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify OwnerID"}))
 
-        owner_id = request_parameters["ownerid"]
+        owner_id = request_parameters["OwnerID"]
 
-        if "date" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify date"}))
+        if "Date" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Date"}))
 
-        date = request_parameters["date"]
+        date = request_parameters["Date"]
 
-        if "quota" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify quota"}))
+        if "Quota" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Quota"}))
 
-        quota = request_parameters["quota"]
+        quota = request_parameters["Quota"]
 
-        if "preference" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify preference"}))
+        if "AttendeePreference" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify AttendeePreference"}))
 
-        preference = request_parameters["preference"]
+        preference = request_parameters["AttendeePreference"]
 
-        if "filmid" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify filmid"}))
+        if "FilmID" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify FilmID"}))
 
-        film_id = request_parameters["filmid"]
+        film_id = request_parameters["FilmID"]
 
-        if "description" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify description"}))
+        if "Description" not in request_parameters.keys():
+            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Description"}))
 
-        description = request_parameters["description"]
+        description = request_parameters["Description"]
 
 
         retrieve_dict = create_advert(owner_id, date, quota, preference, film_id, description)
@@ -557,12 +557,12 @@ def join_advert_view(request):  # Bu bir update islemi ama parametreler cok kucu
 
     try:
 
-        advert_id = request.GET.get('advertid', '')
+        advert_id = request.GET.get('AdvertID', '')
         if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the advertid"}))
-        user_id = request.GET.get('userid', '')
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the AdvertID"}))
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
 
         retrieve_dict = join_advert(advert_id, user_id)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -580,12 +580,12 @@ def accept_user_view(request):  # Bu bir update islemi ama parametreler cok kucu
 
     try:
 
-        advert_id = request.GET.get('advertid', '')
+        advert_id = request.GET.get('AdvertID', '')
         if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the advertid"}))
-        user_id = request.GET.get('userid', '')
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the AdvertID"}))
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
 
         retrieve_dict = accept_user(advert_id, user_id)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -603,12 +603,12 @@ def reject_user_view(request):  # Bu bir update islemi ama parametreler cok kucu
 
     try:
 
-        advert_id = request.GET.get('advertid', '')
+        advert_id = request.GET.get('AdvertID', '')
         if advert_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the advertid"}))
-        user_id = request.GET.get('userid', '')
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify the AdvertID"}))
+        user_id = request.GET.get('UserID', '')
         if user_id == '':  # parametre verilmemis
-            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify userid"}))
+            return HttpResponse(json.dumps({"Status": "Fail", "Message": "You must specify UserID"}))
 
         retrieve_dict = reject_user(advert_id, user_id)
         return HttpResponse(json.dumps(retrieve_dict))
@@ -623,8 +623,7 @@ def redirection_view(request):
     # YOK
     try:
 
-        response = {'Status': 'Fail',
-                    'Message': 'This is default redirection message. You received this message because your URL is bad'}
+        response = {'Status': 'Fail', 'Message': 'This is default redirection message. You received this message because your URL is bad'}
         return HttpResponse(json.dumps(response))
 
     except:
