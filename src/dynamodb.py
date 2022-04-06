@@ -1,8 +1,8 @@
 import boto3
-from id_generator import *
 from current_time import *
 
 INITIAL_LOGIN_VALUE = 1 # Login count bunu tutacak
+INITIAL_ID_VALUE = 1
 
 AWS_ACCESS_KEY_ID = "AKIASCXGL6JSX2WDYG4Z"
 AWS_SECRET_ACCESS_KEY = "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"
@@ -41,6 +41,56 @@ def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevi
     return formatted_item
 
 
+def get_user_id(): # This function returns current user id. We can use this id when creating a user.
+    
+    TABLE_NAME = "IDs"
+    select_statement = f"SELECT * FROM {TABLE_NAME} WHERE Name='UserID'"
+    response = client.execute_statement(Statement=select_statement)
+    userid_dict = response["Items"]
+    userid_dict = format_db_item(userid_dict[0])
+    UserID = userid_dict["Value"]
+    return UserID
+    
+def increment_user_id(): # This function increments user id. We MUST use this function after we call get_user_id function to ensure that our user id is up to date
+    
+    UserID = get_user_id()
+    UserID = UserID + 1
+    update_statement = f"UPDATE \"IDs\" SET \"Value\"={UserID} WHERE \"Name\"='UserID'"
+    response = client.execute_statement(Statement=update_statement)
+
+def get_advert_id(): # This function returns current advert id. We can use this id when creating an advert.
+    TABLE_NAME = "IDs"
+    select_statement = f"SELECT * FROM {TABLE_NAME} WHERE Name='AdvertID'"
+    response = client.execute_statement(Statement=select_statement)
+    advertid_dict = response["Items"]
+    advertid_dict = format_db_item(advertid_dict[0])
+    AdvertID = advertid_dict["Value"]
+    return AdvertID
+
+def increment_advert_id(): # This function increments advert id. We MUST use this function after we call get_advert_id function to ensure that our advert id is up to date
+    
+    AdvertID = get_advert_id()
+    AdvertID = AdvertID + 1
+    update_statement = f"UPDATE \"IDs\" SET \"Value\"={AdvertID} WHERE \"Name\"='AdvertID'"
+    response = client.execute_statement(Statement=update_statement)
+
+def initialize_user_id(): # This function initializes user id with initial value which is 1
+
+    UserID = INITIAL_ID_VALUE
+    update_statement = f"UPDATE \"IDs\" SET \"Value\"={UserID} WHERE \"Name\"='UserID'"
+    response = client.execute_statement(Statement=update_statement)
+
+def initialize_advert_id(): # This function initializes advert id with initial value which is 1
+    
+    AdvertID = INITIAL_ID_VALUE
+    update_statement = f"UPDATE \"IDs\" SET \"Value\"={AdvertID} WHERE \"Name\"='AdvertID'"
+    response = client.execute_statement(Statement=update_statement)
+
+
+def initialize_ids(): # This function initializes both user id and advert id with initial value which is 1
+    
+    initialize_user_id()
+    initialize_advert_id()
 
 # SADECE email zorunlu arguman diger butun argumanlar opsiyonel
 def create_user(email,authtokens=None,name=None,surname=None,username=None,sex=None,age=None,location=None,bio=None,profilephoto=None,likedfilms=None,interests=None,about=None):
