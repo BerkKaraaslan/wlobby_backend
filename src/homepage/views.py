@@ -227,24 +227,27 @@ def update_user_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        request_parameters = json.loads(request.body.decode("utf-8"))
+        request_body = json.loads(request.body.decode("utf-8"))
 
-        if "UserID" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify UserID"}))
+        #if "UserID" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify UserID"}))
 
-        user_id = request_parameters["UserID"]
+        #user_id = request_parameters["UserID"]
 
-        if "Attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
+        #if "Attribute" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["Attribute"]
+        #attribute = request_parameters["Attribute"]
 
-        if "NewValue" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
+        #if "NewValue" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["NewValue"]
+        #new_value = request_parameters["NewValue"]
 
-        retrieve_dict = update_user(user_id,attribute,new_value)
+        #retrieve_dict = update_user(user_id,attribute,new_value)
+        #return HttpResponse(json.dumps(retrieve_dict))
+
+        retrieve_dict = update_user(request_body)
         return HttpResponse(json.dumps(retrieve_dict))
 
     except:

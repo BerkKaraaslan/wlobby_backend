@@ -528,59 +528,336 @@ def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun il
 # attribute parametresi guncellenecek attribute un ismini icerir
 # new_value ise bu attribute un alacagi degeri tasir
 
-def update_user(userid, attribute, new_value): # verilen user i verilen attribute ismini new value ile update edecek
+def update_user(user_json): # verilen user i verilen attribute ismini new value ile update edecek
     # PARAMETER TYPES
 
     # userid -> int
     # attribute -> str
     # new_value -> it could be any valid attribute type
-    
+
     try:
-        TABLE_NAME = "FakeUser"
-        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
-        response = client.execute_statement(Statement=select_statement)
-        user = response["Items"]
+
+        item = ""
+
+        if "UserID" in user_json.keys():
+            user_id = user_json["UserID"]
+        else:
+            user_id = None
+
+        if "CognitoAuthTokens" in user_json.keys():
+            cognito_auth_tokens = user_json["CognitoAuthTokens"]
+        else:
+            cognito_auth_tokens = None
+
+        if "Name" in user_json.keys():
+            name = user_json["Name"]
+        else:
+            name = None
+
+        if "Surname" in user_json.keys():
+            surname = user_json["Surname"]
+        else:
+            surname = None 
+
+        if "Username" in user_json.keys():
+            username = user_json["Username"]
+        else:
+            username = None
+
+        if "AdvertIDs" in user_json.keys():
+            advert_ids = user_json["AdvertIDs"]
+        else:
+            advert_ids = None
+
+        if "Sex" in user_json.keys():
+            sex = user_json["Sex"]
+        else:
+            sex = None
+
+        if "Email" in user_json.keys():
+            email = user_json["Email"]
+        else:
+            email = None
+
+        if "Age" in user_json.keys():
+            age = user_json["Age"]
+        else:
+            age = None
+
+        if "Location" in user_json.keys():
+            location = user_json["Location"]
+        else:
+            location = None
+
+        if "Bio" in user_json.keys():
+            bio = user_json["Bio"]
+        else:
+            bio = None
+
+        if "ProfilePhoto" in user_json.keys():
+            profile_photo = user_json["ProfilePhoto"]
+        else:
+            profile_photo = None
+
+        if "LikedFilms" in user_json.keys():
+            liked_films = user_json["LikedFilms"]
+        else:
+            liked_films = None
+
+        if "WatchedFilms" in user_json.keys():
+            watched_films = user_json["WatchedFilms"]
+        else:
+            watched_films = None
+
+        if "RegistrationDate" in user_json.keys():
+            registration_date = user_json["RegistrationDate"]
+        else:
+            registration_date = None
+
+        if "LastLogIn" in user_json.keys():
+            last_log_in = user_json["LastLogIn"]
+        else:
+            last_log_in = None
+
+        if "LogInCount" in user_json.keys():
+            user_id = user_json["LogInCount"]
+        else:
+            user_id = None
+
+        if "Interests" in user_json.keys():
+            interests = user_json["Interests"]
+        else:
+            interests = None
+
+        if "About" in user_json.keys():
+            about = user_json["About"]
+        else:
+            about = None
+
+        if "AttendedAdverts" in user_json.keys():
+            attended_adverts = user_json["AttendedAdverts"]
+        else:
+            attended_adverts = None
+
+        last_update_date = curr_time()
+
+        # herseyi aldik 
+
+        # string olanlar formatlanacak
+
+        if name is not None:
+            formatted_name = "'" + name + "'"
+
+        if surname is not None:
+            formatted_surname = "'" + surname + "'"
+
+        if username is not None:
+            formatted_username = "'" + username + "'"
+
+        if sex is not None:
+            formatted_sex = "'" + sex + "'"
+
+        if email is not None:
+            formatted_email = "'" + email + "'"
+
+        if location is not None:
+            formatted_location = "'" + location + "'"
+
+        if bio is not None:
+            formatted_bio = "'" + bio + "'"
+
+        if profile_photo is not None:
+            formatted_profile_photo = "'" + profile_photo + "'"
+
+        if registration_date is not None:
+            formatted_registration_date = "'" + registration_date + "'"
+
+        if last_log_in is not None:
+            formatted_last_log_in = "'" + last_log_in + "'"
+
+        if about is not None:
+            formatted_about = "'" + about + "'"
+
+
+
+
+        #advert_ids = [] # Initially an empty list
+        #watched_films = []
+        #attended_adverts = []
+        #registration_date = "'" + curr_time() + "'"
+        #last_log_in = registration_date # Initially they are equal
+        #log_in_count = INITIAL_LOGIN_VALUE
+        #last_update_date = registration_date # Initially they are equal
+        #formatted_email = "'" + email + "'"
+
+        item = item = f"'UserID': {user_id}, 'AdvertIDs': {advert_ids}, 'Email': {formatted_email}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'LastUpdateDate': {last_update_date}, 'AttendedAdverts': {attended_adverts}"
+
+        if name is not None:
+            formatted_name = "'" + name + "'"
+            item = item + f", 'Name':{formatted_name}"
+
+        if surname is not None:
+            formatted_surname = "'" + surname + "'"
+            item = item + f", 'Surname':{formatted_surname}"
+
+        if username is not None:
+            formatted_username = "'" + username + "'"
+            item = item + f", 'Username':{formatted_username}"
+
+        if sex is not None:
+            formatted_sex = "'" + sex + "'"
+            item = item + f", 'Sex':{formatted_sex}"
+
+        if age is not None:
+            age = int(age)
+            item = item + f", 'Age':{age}"
+
+        if location is not None:
+            formatted_location = "'" + location + "'"
+            item = item + f", 'Location':{formatted_location}"
+
+        if bio is not None:
+            formatted_bio = "'" + bio + "'"
+            item = item + f", 'Bio':{formatted_bio}"
+
+        if profilephoto is not None:
+            formatted_photo = "'" + profilephoto + "'"
+            item = item + f", 'ProfilePhoto':{formatted_photo}"
+
+        if about is not None:
+            formatted_about = "'" + about + "'"
+            item = item + f", 'About':{formatted_about}"
+
+        if authtokens is not None:
+            item = item + f", 'CognitoAuthTokens':{authtokens}"
+
+        if likedfilms is not None:
+            item = item + f", 'LikedFilms':{likedfilms}"
+
+        if interests is not None:
+            item = item + f", 'Interests':{interests}"
+
+        
+        TABLE_NAME = 'FakeUser'
+        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
+        result_dict = {} # bunun icine status, message gibi attribute lar koy.
+        # user ıd vs de bunun icinde donulecek
+        response = client.execute_statement(Statement=insert_statement) 
+        #response["Items"]  normalde birsey donmemesi lazim
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = f"New user successfully created with user id:{user_id}"
+        result_dict["UserID"] = user_id
+        return result_dict
+
+        # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         result_dict = {}
+        # her bilgi gelmeli
+        advertid = advert_json["AdvertID"]
+        ownerid = advert_json["OwnerID"]
+        date = advert_json["Date"]
+        registration_date = advert_json["RegistrationDate"]
+        quota = advert_json["Quota"]
+        attendee_preference = advert_json["AttendeePreference"]
+        attendee_ids = advert_json["AttendeeIDs"]
+        status = advert_json["Status"]
+        filmid = advert_json["FilmID"]
+        description = advert_json["Description"]
+        pending_requests = advert_json["PendingRequests"]
+        owner_username = advert_json["OwnerUsername"]
+        last_update_date = curr_time()
 
-        # LogInCount a bakilmadi !!!!!!!!
-        if attribute == "Age": # parametre cast gereklidir !
-            new_value = int(new_value)
+        attendee_ids = create_formatted_str_list(attendee_ids)
+        pending_requests = create_formatted_str_list(pending_requests)
 
-        if len(user) == 0: # No such user exist
-            result_dict["Status"] = "Fail"
-            result_dict["Message"] = f"No such user exist with user id:{userid}"
-            result_dict["UserID"] = userid
-            return result_dict
-        else: # User exist
-          
-            old = None
-            user = format_db_item(user[0])
-            last_update_date = "'" + curr_time() + "'" # user update edildigi icin son guncellenme tarihi guncellenecek
-            
-            if attribute in user.keys(): # we must get the old value
-                old = user[attribute]
-            
-            result_dict["NewValue"] = new_value # onceden ekleniyor cunku str formatlayinca basina ve sonuna tirnak geliyor
-            if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
-                new_value = "'" + new_value + "'"
+        formatted_date = "'" + date + "'"
+        formatted_registration_date = "'" + registration_date + "'"
+        formatted_attendee_preference = "'" + attendee_preference + "'"
+        formatted_status = "'" + status + "'"
+        formatted_description = "'" + description + "'"
+        formatted_owner_username = "'" + owner_username + "'"
+        formatted_last_update_date = "'" + last_update_date + "'"
 
-            update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
-            response = client.execute_statement(Statement=update_statement)
+        # str degerler formatlanacak
 
-            result_dict["Status"] = "Success"
-            if old is None: # eskiden bu attribute yokmus
-                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to user with user id:{userid}"
-            else:
-                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for user with user id:{userid}"
+        #update_statement = f"UPDATE \"IDs\" SET \"Value\"={UserID} WHERE \"Name\"='UserID'"
 
-            result_dict["UserID"] = userid
-            if old is not None:
-                result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
-            #result_dict["NewValue"] = new_value
-            return result_dict
+
+        #TABLE_NAME = "FakeAdvert"
+        update_statement = f"UPDATE \"FakeAdvert\" SET \"LastUpdateDate\"={formatted_last_update_date} SET \"OwnerUsername\"={formatted_owner_username} SET \"PendingRequests\"={pending_requests} SET \"Description\"={formatted_description} SET \"FilmID\"={filmid} SET \"Status\"={formatted_status} SET \"AttendeeIDs\"={attendee_ids} SET \"AttendeePreference\"={formatted_attendee_preference} SET \"Quota\"={quota} SET \"RegistrationDate\"={formatted_registration_date} SET \"Date\"={formatted_date} SET \"OwnerID\"={ownerid} WHERE \"AdvertID\"={advertid}"
+        # SET OwnerUsername={formatted_owner_username}
+        #print(update_statement)
+
+        response = client.execute_statement(Statement=update_statement)
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = "Advert successfully updated"
+
+        return result_dict
+        
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    #try:
+    #    TABLE_NAME = "FakeUser"
+    #    select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+    #    response = client.execute_statement(Statement=select_statement)
+    #    user = response["Items"]
+    #    result_dict = {}
+
+        # LogInCount a bakilmadi !!!!!!!!
+    #    if attribute == "Age": # parametre cast gereklidir !
+    #        new_value = int(new_value)
+
+    #    if len(user) == 0: # No such user exist
+    #        result_dict["Status"] = "Fail"
+    #        result_dict["Message"] = f"No such user exist with user id:{userid}"
+    #        result_dict["UserID"] = userid
+    #        return result_dict
+    #    else: # User exist
+          
+    #        old = None
+    #        user = format_db_item(user[0])
+    #        last_update_date = "'" + curr_time() + "'" # user update edildigi icin son guncellenme tarihi guncellenecek
+            
+    #        if attribute in user.keys(): # we must get the old value
+    #            old = user[attribute]
+            
+    #        result_dict["NewValue"] = new_value # onceden ekleniyor cunku str formatlayinca basina ve sonuna tirnak geliyor
+    #        if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
+    #            new_value = "'" + new_value + "'"
+
+    #        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE UserID={userid}"
+    #        response = client.execute_statement(Statement=update_statement)
+
+    #        result_dict["Status"] = "Success"
+    #        if old is None: # eskiden bu attribute yokmus
+    #            result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to user with user id:{userid}"
+    #        else:
+    #            result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for user with user id:{userid}"
+
+    #        result_dict["UserID"] = userid
+    #        if old is not None:
+    #            result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
+            #result_dict["NewValue"] = new_value
+    #        return result_dict
+
+    #except:
+    #    return {"Status":"Fail", "Message": "An exception occured"}
 
 
 
@@ -842,10 +1119,10 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
 
        
 
-        if attribute == "AttendeeIDs": # Yeni list attribute lar gelirse onlarin da kontrol edilmesi gerekir.
-            value = int(value)
-        elif attribute == "PendingRequests":
-            value = int(value)
+        #if attribute == "AttendeeIDs": # Yeni list attribute lar gelirse onlarin da kontrol edilmesi gerekir.
+        #    value = int(value)
+        #elif attribute == "PendingRequests":
+        #    value = int(value)
 
         
 
@@ -944,6 +1221,7 @@ def join_advert(advertid,userid): # verilen user i verilen advert in pending req
     user = retrieve_user(userid)
     username = user["Item"]["Username"]
     formatted_str = userid + " " + username
+    print(formatted_str)
     return update_advert_list_attributes(int(advertid),"PendingRequests",formatted_str,"add")
 
 def accept_user(advertid,userid): #verilen advert icin userid yi pending requests den cikar ve attendeeids e ekle
