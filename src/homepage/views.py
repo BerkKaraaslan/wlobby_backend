@@ -539,7 +539,7 @@ def create_advert_view(request):
 
         description = request_parameters["Description"]
 
-
+        
         retrieve_dict = create_advert(owner_id, date, quota, preference, film_id, description)
         return HttpResponse(json.dumps(retrieve_dict))
 

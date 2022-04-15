@@ -45,7 +45,7 @@ urlpatterns = [
     path('update/user/',update_user_view), # user i update et       PUT
     path('update/advert/',update_advert_view), # advert i update et      PUT
     path('update/user/list/',update_user_list_attributes_view), # userin list attr.unu update et           PUT
-    path('update/advert/list/',update_advert_list_attributes_view), # advertin list attr.unu update et     PUT
+    #path('update/advert/list/',update_advert_list_attributes_view), # advertin list attr.unu update et     PUT
 
     path('delete/user/',delete_user_view), # useri sil      DELETE
     path('delete/advert/',delete_advert_view), # adverti sil        DELETE

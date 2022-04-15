@@ -41,6 +41,26 @@ def format_db_item(item): # Bu fonksiyon user ve advertleri istenen formata cevi
     return formatted_item
 
 
+def create_attendee_dict(formatted_string_list):
+    # dict i olusturup donecek
+
+    result_dict = {}
+
+    for formatted_string in formatted_string_list:
+        str_list = formatted_string.split(" ")
+        key = str_list[0]
+        value = str_list[1]
+
+        key = int(key) # bu kisim int olacak
+        result_dict[key] = value
+
+
+    return result_dict
+
+
+
+
+
 def get_user_id(): # This function returns current user id. We can use this id when creating a user.
     
     TABLE_NAME = "IDs"
@@ -276,6 +296,7 @@ def retrieve_advert(advertid):
             result_dict["Status"] = "Success"
             result_dict["Message"] = f"Advert with advert id:{advertid} successfully retrieved"
             advert = format_db_item(advert[0])
+            advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi 
             result_dict["Item"] = advert
             return result_dict
 
@@ -289,23 +310,31 @@ def retrieve_users_all_adverts(userid):
     # userid -> int
     try:
         userid = int(userid)
-        TABLE_NAME = "FakeUser"
-        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE UserID={userid}"
+        TABLE_NAME = "FakeAdvert"
+        select_statement = f"SELECT * FROM {TABLE_NAME}"
         response = client.execute_statement(Statement=select_statement)
-        user = response["Items"]
+        adverts = response["Items"]
 
         result_dict = {}
 
-        if len(user) == 0: # No such user exist
+        if len(adverts) == 0: # No such user exist
             result_dict["Status"] = "Fail"
-            result_dict["Message"] = f"No such user exist with user id:{userid}"
-            result_dict["UserID"] = userid
+            result_dict["Message"] = f"No such advert exist in advert table"
+            #result_dict["UserID"] = userid
             return result_dict
         else: # User exist
             result_dict["Status"] = "Success"
-            result_dict["Message"] = f"User with user id:{userid} successfully retrieved"
-            user = format_db_item(user[0])
-            result_dict["Item"] = user["AdvertIDs"]
+            result_dict["Message"] = f"All adverts with OwnerID:{userid} successfully retrieved"
+            #user = format_db_item(user[0])
+            #result_dict["Item"] = user["AdvertIDs"]
+            advert_list = []
+            for advert in adverts:
+                formatted_advert = format_db_item(advert) # once formatlamak gerekiyor
+                formatted_advert["AttendeeIDs"] = create_attendee_dict(formatted_advert["AttendeeIDs"])
+                if formatted_advert["OwnerID"] == userid: # sadece o user inkiler donulecek
+                    advert_list.append(formatted_advert)
+
+            result_dict["Items"] = advert_list   
             return result_dict
 
     except:
@@ -437,6 +466,7 @@ def retrieve_all_adverts():
         result_dict["Message"] = f"All adverts successfully retrieved"
         for item in items:
             tmp = format_db_item(item)
+            tmp["AttendeeIDs"] = create_attendee_dict(tmp["AttendeeIDs"]) # yeni eklendi
             adverts.append(tmp)
 
         result_dict["Items"] = adverts
@@ -467,6 +497,7 @@ def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun il
 
         for advert in adverts:
             if advert["FilmID"] == filmid: # eger id si ayni ise donecegimiz listeye adverti ekle
+                advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi
                 adverts_with_filmid.append(advert)
 
         result_dict["Status"] = "Success"
@@ -737,10 +768,14 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
         advert = response["Items"]
         result_dict = {}
 
+       
+
         if attribute == "AttendeeIDs": # Yeni list attribute lar gelirse onlarin da kontrol edilmesi gerekir.
             value = int(value)
         elif attribute == "PendingRequests":
             value = int(value)
+
+        
 
         if len(advert) == 0: # No such advert exist
             result_dict["Status"] = "Fail"
@@ -834,20 +869,27 @@ def update_advert_list_attributes(advertid, attribute, value, op_type):
 # Asagidaki fonksiyonlar ilanlarin "PendingRequests" attribute u olmadiginda duzgun calismayabilir !!!!!
 
 def join_advert(advertid,userid): # verilen user i verilen advert in pending requests ine eger orada ekli degilse ekleyecek
-    return update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"add")
+    user = retrieve_user(userid)
+    username = user["Item"]["Username"]
+    formatted_str = userid + " " + username
+    return update_advert_list_attributes(int(advertid),"PendingRequests",formatted_str,"add")
 
 def accept_user(advertid,userid): #verilen advert icin userid yi pending requests den cikar ve attendeeids e ekle
 
     try:
         
         result_dict = {}
-        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"remove")
+        user = retrieve_user(userid)
+        username = user["Item"]["Username"]
+        formatted_str = userid + " " + username
+
+        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",formatted_str,"remove")
         if remove_query["Status"] == "Fail": # eger silemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
             result_dict["Status"] = remove_query["Status"]
             result_dict["Message"] = remove_query["Message"]
             return result_dict
 
-        add_query = update_advert_list_attributes(int(advertid),"AttendeeIDs",int(userid),"add")
+        add_query = update_advert_list_attributes(int(advertid),"AttendeeIDs",formatted_str,"add")
         if add_query["Status"] == "Fail": # eger ekleyemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
             result_dict["Status"] = add_query["Status"]
             result_dict["Message"] = add_query["Message"]
@@ -872,7 +914,11 @@ def reject_user(advertid,userid): # verilen advert icin user id yi pending reque
     try:
 
         result_dict = {}
-        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",int(userid),"remove")
+        user = retrieve_user(userid)
+        username = user["Item"]["Username"]
+        formatted_str = userid + " " + username
+
+        remove_query = update_advert_list_attributes(int(advertid),"PendingRequests",formatted_str,"remove")
         if remove_query["Status"] == "Fail": # eger silemedi ise ya boyle bir ilan yok ya op_type yanlis yada bir exception oldu
             result_dict["Status"] = remove_query["Status"]
             result_dict["Message"] = remove_query["Message"]
@@ -887,7 +933,7 @@ def reject_user(advertid,userid): # verilen advert icin user id yi pending reque
 
 
 
-def create_advert(ownerid,date,quota,preference,filmid,description):
+def create_advert(ownerid,date,quota,preference,filmid,description,filmname):
     # PARAMETER TYPES
 
     # ownerid -> int
@@ -896,6 +942,10 @@ def create_advert(ownerid,date,quota,preference,filmid,description):
     # preference -> str
     # filmid -> int
     # description -> str
+
+    # 1 yeni sey eklenecek
+    # OwnerUsername biz otomatik alacagiz
+   
 
     try: 
 
@@ -912,11 +962,16 @@ def create_advert(ownerid,date,quota,preference,filmid,description):
         last_update_date = registration_date # Initially they are equal
         attendee_ids = []
         pending_requests = []
-        attendee_ids.append(ownerid)
+        #attendee_ids.append(ownerid)
         status = "'Active'"
+        owner = retrieve_user(ownerid)
+        owner_username = owner["Item"]["Username"]
+        formatted_owner_username = "'" + owner_username + "'"
+        formatted_attendee_ids_item = str(ownerid) + " " + owner_username
+        attendee_ids.append(formatted_attendee_ids_item)
 
         TABLE_NAME = 'FakeAdvert'
-        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Description': {formatted_description}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}, 'PendingRequests': {pending_requests}"
+        item = f"'AdvertID': {advert_id}, 'OwnerID': {ownerid}, 'Description': {formatted_description}, 'Date': {formatted_date}, 'RegistrationDate': {registration_date}, 'LastUpdateDate': {last_update_date}, 'Quota': {quota}, 'AttendeePreference': {formatted_preference}, 'AttendeeIDs': {attendee_ids}, 'Status': {status}, 'FilmID': {filmid}, 'PendingRequests': {pending_requests}, 'OwnerUsername': {formatted_owner_username}"     
         insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
 
         result_dict = {} 
@@ -938,6 +993,7 @@ def create_advert(ownerid,date,quota,preference,filmid,description):
     result_dict["Message"] = f"New advert successfully created with advert id:{advert_id}"
     result_dict["AdvertID"] = advert_id
     return result_dict
+
 
 
 def delete_advert(advertid):
