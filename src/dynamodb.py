@@ -1,3 +1,4 @@
+from unittest import result
 import boto3
 from current_time import *
 
@@ -57,8 +58,16 @@ def create_attendee_dict(formatted_string_list):
 
     return result_dict
 
+def create_formatted_str_list(formatted_dict):
 
+    result_list = []
 
+    for key,value in formatted_dict.items():
+        tmp_str = ""
+        tmp_str = str(key) + " " + value
+        result_list.append(tmp_str)
+    
+    return result_list
 
 
 def get_user_id(): # This function returns current user id. We can use this id when creating a user.
@@ -297,6 +306,7 @@ def retrieve_advert(advertid):
             result_dict["Message"] = f"Advert with advert id:{advertid} successfully retrieved"
             advert = format_db_item(advert[0])
             advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi 
+            advert["PendingRequests"] = create_attendee_dict(advert["PendingRequests"])
             result_dict["Item"] = advert
             return result_dict
 
@@ -331,6 +341,7 @@ def retrieve_users_all_adverts(userid):
             for advert in adverts:
                 formatted_advert = format_db_item(advert) # once formatlamak gerekiyor
                 formatted_advert["AttendeeIDs"] = create_attendee_dict(formatted_advert["AttendeeIDs"])
+                formatted_advert["PendingRequests"] = create_attendee_dict(formatted_advert["PendingRequests"])
                 if formatted_advert["OwnerID"] == userid: # sadece o user inkiler donulecek
                     advert_list.append(formatted_advert)
 
@@ -467,6 +478,7 @@ def retrieve_all_adverts():
         for item in items:
             tmp = format_db_item(item)
             tmp["AttendeeIDs"] = create_attendee_dict(tmp["AttendeeIDs"]) # yeni eklendi
+            tmp["PendingRequests"] = create_attendee_dict(tmp["PendingRequests"])
             adverts.append(tmp)
 
         result_dict["Items"] = adverts
@@ -498,6 +510,7 @@ def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun il
         for advert in adverts:
             if advert["FilmID"] == filmid: # eger id si ayni ise donecegimiz listeye adverti ekle
                 advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi
+                advert["PendingRequests"] = create_attendee_dict(advert["PendingRequests"])
                 adverts_with_filmid.append(advert)
 
         result_dict["Status"] = "Success"
@@ -687,63 +700,122 @@ def update_user_list_attributes(userid, attribute, value, op_type):
         return {"Status":"Fail", "Message": "An exception occured"}
 
 
-def update_advert(advertid, attribute, new_value): # verilen user i verilen attribute ismini new value ile update edecek
+def update_advert(advert_json): # verilen user i verilen attribute ismini new value ile update edecek
     # PARAMETER TYPES
 
     # advertid -> int
     # attribute -> str
     # new_value -> it could be any valid attribute type
-    
+
     try:
-        TABLE_NAME = "FakeAdvert"
-        select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
-        response = client.execute_statement(Statement=select_statement)
-        advert = response["Items"]
         result_dict = {}
+        # her bilgi gelmeli
+        advertid = advert_json["AdvertID"]
+        ownerid = advert_json["OwnerID"]
+        date = advert_json["Date"]
+        registration_date = advert_json["RegistrationDate"]
+        quota = advert_json["Quota"]
+        attendee_preference = advert_json["AttendeePreference"]
+        attendee_ids = advert_json["AttendeeIDs"]
+        status = advert_json["Status"]
+        filmid = advert_json["FilmID"]
+        description = advert_json["Description"]
+        pending_requests = advert_json["PendingRequests"]
+        owner_username = advert_json["OwnerUsername"]
+        last_update_date = curr_time()
 
-        if attribute == "FilmID": # Baska int tipinde attribute eklenirse bu islem gereklidir !
-            new_value = int(new_value)
-        elif attribute == "OwnerID":
-            new_value = int(new_value)
-        elif attribute == "Quota":
-            new_value = int(new_value)
+        attendee_ids = create_formatted_str_list(attendee_ids)
+        pending_requests = create_formatted_str_list(pending_requests)
+
+        formatted_date = "'" + date + "'"
+        formatted_registration_date = "'" + registration_date + "'"
+        formatted_attendee_preference = "'" + attendee_preference + "'"
+        formatted_status = "'" + status + "'"
+        formatted_description = "'" + description + "'"
+        formatted_owner_username = "'" + owner_username + "'"
+        formatted_last_update_date = "'" + last_update_date + "'"
+
+        # str degerler formatlanacak
+
+        #update_statement = f"UPDATE \"IDs\" SET \"Value\"={UserID} WHERE \"Name\"='UserID'"
+
+
+        #TABLE_NAME = "FakeAdvert"
+        update_statement = f"UPDATE \"FakeAdvert\" SET \"LastUpdateDate\"={formatted_last_update_date} SET \"OwnerUsername\"={formatted_owner_username} SET \"PendingRequests\"={pending_requests} SET \"Description\"={formatted_description} SET \"FilmID\"={filmid} SET \"Status\"={formatted_status} SET \"AttendeeIDs\"={attendee_ids} SET \"AttendeePreference\"={formatted_attendee_preference} SET \"Quota\"={quota} SET \"RegistrationDate\"={formatted_registration_date} SET \"Date\"={formatted_date} SET \"OwnerID\"={ownerid} WHERE \"AdvertID\"={advertid}"
+        # SET OwnerUsername={formatted_owner_username}
+        #print(update_statement)
+
+        response = client.execute_statement(Statement=update_statement)
+
+        result_dict["Status"] = "Success"
+        result_dict["Message"] = "Advert successfully updated"
+
+        return result_dict
         
-
-        if len(advert) == 0: # No such advert exist
-            result_dict["Status"] = "Fail"
-            result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
-            result_dict["AdvertID"] = advertid
-            return result_dict
-        else: # Advert exist
-          
-            old = None
-            advert = format_db_item(advert[0])
-            last_update_date = "'" + curr_time() + "'" # advert update edildigi icin son guncellenme tarihi guncellenecek
-            
-            if attribute in advert.keys(): # we must get the old value
-                old = advert[attribute]
-            
-            result_dict["NewValue"] = new_value
-            if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
-                new_value = "'" + new_value + "'"
-
-            update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
-            response = client.execute_statement(Statement=update_statement)
-
-            result_dict["Status"] = "Success"
-            if old is None: # eskiden bu attribute yokmus
-                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to advert with advert id:{advertid}"
-            else:
-                result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for advert with advert id:{advertid}"
-
-            result_dict["AdvertID"] = advertid
-            if old is not None:
-                result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
-            #result_dict["NewValue"] = new_value
-            return result_dict
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+    
+    #try:
+    #    TABLE_NAME = "FakeAdvert"
+    #    select_statement = f"SELECT * FROM {TABLE_NAME} WHERE AdvertID={advertid}"
+    #    response = client.execute_statement(Statement=select_statement)
+    #    advert = response["Items"]
+    #    result_dict = {}
+
+    #    if attribute == "FilmID": # Baska int tipinde attribute eklenirse bu islem gereklidir !
+    #        new_value = int(new_value)
+    #    elif attribute == "OwnerID":
+    #        new_value = int(new_value)
+    #    elif attribute == "Quota":
+    #        new_value = int(new_value)
+        
+
+    #    if len(advert) == 0: # No such advert exist
+    #        result_dict["Status"] = "Fail"
+    #        result_dict["Message"] = f"No such advert exist with advert id:{advertid}"
+    #        result_dict["AdvertID"] = advertid
+    #        return result_dict
+    #    else: # Advert exist
+          
+    #        old = None
+    #        advert = format_db_item(advert[0])
+    #        last_update_date = "'" + curr_time() + "'" # advert update edildigi icin son guncellenme tarihi guncellenecek
+            
+    #        if attribute in advert.keys(): # we must get the old value
+    #            old = advert[attribute]
+            
+    #        result_dict["NewValue"] = new_value
+    #        if type(new_value) is str: # deger str olunca tirnak isaretinden dolayi koymazsak kiziyor
+    #            new_value = "'" + new_value + "'"
+
+    #        update_statement = f"UPDATE {TABLE_NAME} SET {attribute}={new_value} SET LastUpdateDate={last_update_date} WHERE AdvertID={advertid}"
+    #        response = client.execute_statement(Statement=update_statement)
+
+    #        result_dict["Status"] = "Success"
+    #        if old is None: # eskiden bu attribute yokmus
+    #            result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully added to advert with advert id:{advertid}"
+    #        else:
+    #            result_dict["Message"] = f"Attribute with attribute name:{attribute} has successfully updated for advert with advert id:{advertid}"
+
+    #        result_dict["AdvertID"] = advertid
+    #        if old is not None:
+    #            result_dict["OldValue"] = old # eger old valuesu varsa ekleriz
+            #result_dict["NewValue"] = new_value
+    #        return result_dict
+
+    #except:
+    #    return {"Status":"Fail", "Message": "An exception occured"}
+
+
+
+
+
+
 
 
 def update_advert_list_attributes(advertid, attribute, value, op_type):

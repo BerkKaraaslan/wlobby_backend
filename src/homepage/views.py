@@ -192,13 +192,13 @@ def get_adverts_view(request):
 
     # YOK
     # REQUEST TYPE -> GET
-    try:
+    #try:
 
         retrieve_dict = retrieve_all_adverts()
         return HttpResponse(json.dumps(retrieve_dict))
 
-    except:
-        return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
+    #except:
+    #    return HttpResponse(json.dumps({"Status": "Fail", "Message": "An exception occured during URL parsing"}))
 
 
 def get_adverts_with_filmid_view(request):
@@ -260,24 +260,26 @@ def update_advert_view(request):
     # REQUEST TYPE -> GET
     try:
 
-        request_parameters = json.loads(request.body.decode("utf-8"))
+        request_body = json.loads(request.body.decode("utf-8")) # bu direk bize json olarak hersey gelecek
 
-        if "AdvertID" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify AdvertID"}))
+        #if "AdvertID" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify AdvertID"}))
 
-        advert_id = request_parameters["AdvertID"]
+        #advert_id = request_parameters["AdvertID"]
 
-        if "Attribute" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
+        #if "Attribute" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify Attribute"}))
 
-        attribute = request_parameters["Attribute"]
+        #attribute = request_parameters["Attribute"]
 
-        if "NewValue" not in request_parameters.keys():
-            return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
+        #if "NewValue" not in request_parameters.keys():
+        #    return HttpResponse(json.dumps({"Status":"Fail","Message":"You must specify NewValue"}))
 
-        new_value = request_parameters["NewValue"]
+        #new_value = request_parameters["NewValue"]
 
-        retrieve_dict = update_advert(advert_id,attribute,new_value)
+        
+        
+        retrieve_dict = update_advert(request_body)
         return HttpResponse(json.dumps(retrieve_dict))
 
     except:
