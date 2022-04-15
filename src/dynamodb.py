@@ -620,9 +620,9 @@ def update_user(user_json): # verilen user i verilen attribute ismini new value 
             last_log_in = None
 
         if "LogInCount" in user_json.keys():
-            user_id = user_json["LogInCount"]
+            log_in_count = user_json["LogInCount"]
         else:
-            user_id = None
+            log_in_count = None
 
         if "Interests" in user_json.keys():
             interests = user_json["Interests"]
@@ -644,157 +644,100 @@ def update_user(user_json): # verilen user i verilen attribute ismini new value 
         # herseyi aldik 
 
         # string olanlar formatlanacak
-
-        if name is not None:
-            formatted_name = "'" + name + "'"
-
-        if surname is not None:
-            formatted_surname = "'" + surname + "'"
-
-        if username is not None:
-            formatted_username = "'" + username + "'"
-
-        if sex is not None:
-            formatted_sex = "'" + sex + "'"
+        # esittir olacak !!!!!
 
         if email is not None:
             formatted_email = "'" + email + "'"
+            item = item + f' SET "Email"={formatted_email}'
 
-        if location is not None:
-            formatted_location = "'" + location + "'"
-
-        if bio is not None:
-            formatted_bio = "'" + bio + "'"
-
-        if profile_photo is not None:
-            formatted_profile_photo = "'" + profile_photo + "'"
-
-        if registration_date is not None:
-            formatted_registration_date = "'" + registration_date + "'"
-
-        if last_log_in is not None:
-            formatted_last_log_in = "'" + last_log_in + "'"
-
-        if about is not None:
-            formatted_about = "'" + about + "'"
-
-
-
-
-        #advert_ids = [] # Initially an empty list
-        #watched_films = []
-        #attended_adverts = []
-        #registration_date = "'" + curr_time() + "'"
-        #last_log_in = registration_date # Initially they are equal
-        #log_in_count = INITIAL_LOGIN_VALUE
-        #last_update_date = registration_date # Initially they are equal
-        #formatted_email = "'" + email + "'"
-
-        item = item = f"'UserID': {user_id}, 'AdvertIDs': {advert_ids}, 'Email': {formatted_email}, 'WatchedFilms': {watched_films}, 'RegistrationDate': {registration_date}, 'LastLogIn': {last_log_in},  'LogInCount': {log_in_count}, 'LastUpdateDate': {last_update_date}, 'AttendedAdverts': {attended_adverts}"
+        if cognito_auth_tokens is not None:
+            item = item + f' SET "CognitoAuthTokens"={cognito_auth_tokens}'
 
         if name is not None:
             formatted_name = "'" + name + "'"
-            item = item + f", 'Name':{formatted_name}"
+            item = item + f' SET "Name"={formatted_name}'
 
         if surname is not None:
             formatted_surname = "'" + surname + "'"
-            item = item + f", 'Surname':{formatted_surname}"
+            item = item + f' SET "Surname"={formatted_surname}'
 
         if username is not None:
             formatted_username = "'" + username + "'"
-            item = item + f", 'Username':{formatted_username}"
+            item = item + f' SET "Username"={formatted_username}'
+
+        if advert_ids is not None:
+            item = item + f' SET "AdvertIDs"={advert_ids}'
 
         if sex is not None:
             formatted_sex = "'" + sex + "'"
-            item = item + f", 'Sex':{formatted_sex}"
+            item = item + f' SET "Sex"={formatted_sex}'
 
         if age is not None:
-            age = int(age)
-            item = item + f", 'Age':{age}"
+            #age = int(age)
+            item = item + f' SET "Age"={age}'
 
         if location is not None:
             formatted_location = "'" + location + "'"
-            item = item + f", 'Location':{formatted_location}"
+            item = item + f' SET "Location"={formatted_location}'
 
         if bio is not None:
             formatted_bio = "'" + bio + "'"
-            item = item + f", 'Bio':{formatted_bio}"
+            item = item + f' SET "Bio"={formatted_bio}'
 
-        if profilephoto is not None:
-            formatted_photo = "'" + profilephoto + "'"
-            item = item + f", 'ProfilePhoto':{formatted_photo}"
+        if profile_photo is not None:
+            formatted_profile_photo = "'" + profile_photo + "'"
+            item = item + f' SET "ProfilePhoto"={formatted_profile_photo}'
+
+        if liked_films is not None:
+            item = item + f' SET "LikedFilms"={liked_films}'
+
+        if watched_films is not None:
+            item = item + f' SET "WatchedFilms"={watched_films}'
+
+        if registration_date is not None:
+            formatted_registration_date = "'" + registration_date + "'"
+            item = item + f' SET "RegistrationDate"={formatted_registration_date}'
+
+        if last_log_in is not None:
+            formatted_last_log_in = "'" + last_log_in + "'"
+            item = item + f' SET "LastLogIn"={formatted_last_log_in}'
+
+        if log_in_count is not None:
+            item = item + f' SET "LogInCount"={log_in_count}'
+
+        if interests is not None:
+            item = item + f' SET "Interests"={interests}'
 
         if about is not None:
             formatted_about = "'" + about + "'"
-            item = item + f", 'About':{formatted_about}"
+            item = item + f' SET "About"={formatted_about}'
 
-        if authtokens is not None:
-            item = item + f", 'CognitoAuthTokens':{authtokens}"
+        if attended_adverts is not None:
+            item = item + f' SET "AttendedAdverts"={attended_adverts}'
 
-        if likedfilms is not None:
-            item = item + f", 'LikedFilms':{likedfilms}"
+        formatted_last_update_date = "'" + last_update_date + "'"
 
-        if interests is not None:
-            item = item + f", 'Interests':{interests}"
+        item = item + f' SET "LastUpdateDate"={formatted_last_update_date}'
+
+        item = item + " "
+    
+
+
+        #TABLE_NAME = 'FakeUser'
+        update_statement = f'UPDATE \"FakeUser\" {item} WHERE \"UserID\"={user_id}'
 
         
-        TABLE_NAME = 'FakeUser'
-        insert_statement = f"INSERT INTO {TABLE_NAME} VALUE " + "{" + item + "}"
+
+
         result_dict = {} # bunun icine status, message gibi attribute lar koy.
         # user ıd vs de bunun icinde donulecek
-        response = client.execute_statement(Statement=insert_statement) 
+        response = client.execute_statement(Statement=update_statement) 
         #response["Items"]  normalde birsey donmemesi lazim
 
         result_dict["Status"] = "Success"
-        result_dict["Message"] = f"New user successfully created with user id:{user_id}"
+        result_dict["Message"] = "User successfully updated"
         result_dict["UserID"] = user_id
         return result_dict
-
-        # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        result_dict = {}
-        # her bilgi gelmeli
-        advertid = advert_json["AdvertID"]
-        ownerid = advert_json["OwnerID"]
-        date = advert_json["Date"]
-        registration_date = advert_json["RegistrationDate"]
-        quota = advert_json["Quota"]
-        attendee_preference = advert_json["AttendeePreference"]
-        attendee_ids = advert_json["AttendeeIDs"]
-        status = advert_json["Status"]
-        filmid = advert_json["FilmID"]
-        description = advert_json["Description"]
-        pending_requests = advert_json["PendingRequests"]
-        owner_username = advert_json["OwnerUsername"]
-        last_update_date = curr_time()
-
-        attendee_ids = create_formatted_str_list(attendee_ids)
-        pending_requests = create_formatted_str_list(pending_requests)
-
-        formatted_date = "'" + date + "'"
-        formatted_registration_date = "'" + registration_date + "'"
-        formatted_attendee_preference = "'" + attendee_preference + "'"
-        formatted_status = "'" + status + "'"
-        formatted_description = "'" + description + "'"
-        formatted_owner_username = "'" + owner_username + "'"
-        formatted_last_update_date = "'" + last_update_date + "'"
-
-        # str degerler formatlanacak
-
-        #update_statement = f"UPDATE \"IDs\" SET \"Value\"={UserID} WHERE \"Name\"='UserID'"
-
-
-        #TABLE_NAME = "FakeAdvert"
-        update_statement = f"UPDATE \"FakeAdvert\" SET \"LastUpdateDate\"={formatted_last_update_date} SET \"OwnerUsername\"={formatted_owner_username} SET \"PendingRequests\"={pending_requests} SET \"Description\"={formatted_description} SET \"FilmID\"={filmid} SET \"Status\"={formatted_status} SET \"AttendeeIDs\"={attendee_ids} SET \"AttendeePreference\"={formatted_attendee_preference} SET \"Quota\"={quota} SET \"RegistrationDate\"={formatted_registration_date} SET \"Date\"={formatted_date} SET \"OwnerID\"={ownerid} WHERE \"AdvertID\"={advertid}"
-        # SET OwnerUsername={formatted_owner_username}
-        #print(update_statement)
-
-        response = client.execute_statement(Statement=update_statement)
-
-        result_dict["Status"] = "Success"
-        result_dict["Message"] = "Advert successfully updated"
-
-        return result_dict
-        
 
     except:
         return {"Status":"Fail", "Message": "An exception occured"}
