@@ -509,8 +509,8 @@ def retrieve_all_adverts_with_filmid(filmid): # verilen filmid ye sahip butun il
 
         for advert in adverts:
             if advert["FilmID"] == filmid: # eger id si ayni ise donecegimiz listeye adverti ekle
-                advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi
-                advert["PendingRequests"] = create_attendee_dict(advert["PendingRequests"])
+                #advert["AttendeeIDs"] = create_attendee_dict(advert["AttendeeIDs"]) # yeni eklendi
+                #advert["PendingRequests"] = create_attendee_dict(advert["PendingRequests"])
                 adverts_with_filmid.append(advert)
 
         result_dict["Status"] = "Success"
