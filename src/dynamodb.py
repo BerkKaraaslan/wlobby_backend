@@ -58,6 +58,7 @@ def create_attendee_dict(formatted_string_list):
 
     return result_dict
 
+
 def create_formatted_str_list(formatted_dict):
 
     result_list = []
