@@ -1226,7 +1226,7 @@ def reject_user(advertid,userid): # verilen advert icin user id yi pending reque
 
 
 
-def create_advert(ownerid,date,quota,preference,filmid,description,filmname):
+def create_advert(ownerid,date,quota,preference,filmid,description):
     # PARAMETER TYPES
 
     # ownerid -> int
